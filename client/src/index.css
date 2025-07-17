@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(210, 15%, 20%);
+  --muted: hsl(210, 10%, 96%);
+  --muted-foreground: hsl(210, 10%, 45%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(210, 15%, 20%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(210, 15%, 20%);
+  --border: hsl(210, 20%, 90%);
+  --input: hsl(210, 20%, 90%);
+  --primary: hsl(325, 28%, 42%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(210, 10%, 96%);
+  --secondary-foreground: hsl(210, 15%, 10%);
+  --accent: hsl(210, 10%, 96%);
+  --accent-foreground: hsl(210, 15%, 10%);
+  --destructive: hsl(0, 84%, 60%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(325, 28%, 42%);
+  --radius: 0.75rem;
+  
+  /* Cohen-specific colors */
+  --cohen-burgundy: hsl(325, 28%, 42%);
+  --cohen-burgundy-dark: hsl(325, 35%, 32%);
+  --cohen-burgundy-light: hsl(325, 25%, 52%);
+  --cohen-gray: hsl(210, 17%, 98%);
+  --cohen-text: hsl(210, 15%, 20%);
+  --cohen-border: hsl(210, 20%, 90%);
+}
+
+.dark {
+  --background: hsl(210, 15%, 7%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(210, 15%, 15%);
+  --muted-foreground: hsl(210, 10%, 65%);
+  --popover: hsl(210, 15%, 7%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(210, 15%, 7%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(210, 15%, 15%);
+  --input: hsl(210, 15%, 15%);
+  --primary: hsl(325, 28%, 42%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(210, 15%, 15%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(210, 15%, 15%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 63%, 31%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(325, 28%, 42%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+/* Cohen custom utilities */
+.cohen-burgundy {
+  background-color: var(--cohen-burgundy);
+}
+
+.cohen-burgundy-dark {
+  background-color: var(--cohen-burgundy-dark);
+}
+
+.cohen-burgundy-light {
+  background-color: var(--cohen-burgundy-light);
+}
+
+.cohen-gray {
+  background-color: var(--cohen-gray);
+}
+
+.text-cohen-burgundy {
+  color: var(--cohen-burgundy);
+}
+
+.text-cohen-text {
+  color: var(--cohen-text);
+}
+
+.border-cohen-border {
+  border-color: var(--cohen-border);
+}
+
+.border-cohen-burgundy {
+  border-color: var(--cohen-burgundy);
+}
+
+/* Animation for file upload */
+.upload-animation {
+  animation: uploadPulse 2s infinite;
+}
+
+@keyframes uploadPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+/* Processing animation */
+.processing-spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
