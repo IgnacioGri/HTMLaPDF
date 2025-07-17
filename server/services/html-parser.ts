@@ -2,59 +2,115 @@ import * as cheerio from 'cheerio';
 import type { AnalysisResult } from '@shared/schema';
 
 export function analyzeHtml(htmlContent: string): AnalysisResult {
-  const $ = cheerio.load(htmlContent);
-  
-  // Detect Cohen report structure
-  const hasCohenBranding = $('header').text().toLowerCase().includes('cohen') || 
-                          $('h1, h2, h3').text().toLowerCase().includes('cohen') ||
-                          $('.cohen').length > 0;
+  try {
+    const $ = cheerio.load(htmlContent);
+    
+    // Detect Cohen report structure - more comprehensive detection
+    const bodyText = $('body').text().toLowerCase();
+    const htmlText = htmlContent.toLowerCase();
+    
+    // Check for Cohen-specific patterns
+    const cohenPattern = htmlText.includes('cohen');
+    const igjPattern = htmlText.includes('igj');
+    const logoPattern = $('img[src*="cohen"]').length > 0;
+    const classPattern = $('.bg-custom-reporte-mensual').length > 0;
+    const reportPattern = bodyText.includes('resumen de') && bodyText.includes('para la cuenta');
+    
+    const hasCohenBranding = cohenPattern || igjPattern || logoPattern || classPattern || reportPattern;
 
-  // Count tables
-  const tables = $('table');
-  const tableCount = tables.length;
+    // Count tables - look for both table elements and div structures that act as tables
+    const tables = $('table');
+    const divTables = $('.table, .data-table, [class*="table"]').filter((i, el) => {
+      return $(el).find('tr, .row').length > 0;
+    });
+    const tableCount = tables.length + divTables.length;
 
-  // Count assets by looking for specific patterns in Cohen reports
-  let assetCount = 0;
-  
-  // Look for asset entries in tables
-  $('table tbody tr').each((i, row) => {
-    const rowText = $(row).text().toLowerCase();
+    // Count assets by looking for specific patterns in Cohen reports
+    let assetCount = 0;
+    
+    // Look for investment assets in the content
+    const content = bodyText;
+    
     // Common patterns in Cohen financial reports
-    if (rowText.includes('acción') || 
-        rowText.includes('bono') || 
-        rowText.includes('fondo') ||
-        rowText.includes('plazo fijo') ||
-        rowText.includes('cedear')) {
-      assetCount++;
+    const assetPatterns = [
+      /acción|acciones/g,
+      /bono|bonos/g,
+      /fondo|fondos/g,
+      /plazo fijo/g,
+      /cedear/g,
+      /obligación|obligaciones/g,
+      /letes?/g,
+      /lecap/g,
+      /aluar|pampa|ypf|tenaris|galicia|macro/g // Common Argentine stocks
+    ];
+    
+    assetPatterns.forEach(pattern => {
+      const matches = content.match(pattern);
+      if (matches) {
+        assetCount += matches.length;
+      }
+    });
+
+    // Also count from structured data
+    $('table tbody tr, .investment-row, .asset-row').each((i, row) => {
+      const rowText = $(row).text().toLowerCase();
+      if (rowText.includes('$') && (
+          rowText.includes('acción') || 
+          rowText.includes('bono') || 
+          rowText.includes('fondo') ||
+          rowText.includes('plazo fijo') ||
+          rowText.includes('cedear') ||
+          rowText.includes('lote')
+        )) {
+        assetCount++;
+      }
+    });
+
+    // Estimate pages based on content length and complexity
+    const contentLength = $.text().length;
+    const complexTables = $('table').filter((i, table) => {
+      return $(table).find('tr').length > 10;
+    }).length;
+
+    let estimatedPages = Math.ceil(contentLength / 12000); // Adjusted for financial reports
+    if (complexTables > 0) {
+      estimatedPages += Math.ceil(complexTables * 0.7); // Financial tables are denser
     }
-  });
 
-  // Estimate pages based on content length and table complexity
-  const contentLength = $.text().length;
-  const complexTables = $('table').filter((i, table) => {
-    return $(table).find('tr').length > 10; // Tables with more than 10 rows
-  }).length;
+    // Cohen reports are typically 2-8 pages
+    estimatedPages = Math.max(2, Math.min(estimatedPages, 8));
 
-  let estimatedPages = Math.ceil(contentLength / 15000); // Rough estimate
-  if (complexTables > 0) {
-    estimatedPages += Math.ceil(complexTables * 0.5); // Add extra for complex tables
+    const pageEstimate = estimatedPages <= 1 ? "1" : 
+                        estimatedPages <= 3 ? `${estimatedPages}` : 
+                        `${estimatedPages-1}-${estimatedPages+1}`;
+
+    // Calculate file size
+    const fileSizeBytes = Buffer.byteLength(htmlContent, 'utf8');
+    const fileSizeMB = (fileSizeBytes / (1024 * 1024)).toFixed(1);
+
+    console.log('Analysis details:', {
+      contentLength,
+      hasCohenBranding,
+      tableCount,
+      assetCount,
+      estimatedPages,
+      cohenInHtml: htmlText.includes('cohen'),
+      igj: htmlText.includes('igj'),
+      resumePattern: bodyText.includes('resumen de'),
+      cuentaPattern: bodyText.includes('para la cuenta')
+    });
+
+    return {
+      tableCount,
+      assetCount: Math.max(assetCount, 0),
+      estimatedPages: pageEstimate,
+      isValidCohenFormat: hasCohenBranding,
+      fileSize: `${fileSizeMB} MB`,
+    };
+  } catch (error) {
+    console.error('HTML analysis error:', error);
+    throw new Error(`Failed to analyze HTML: ${error.message}`);
   }
-
-  const pageEstimate = estimatedPages <= 1 ? "1" : 
-                      estimatedPages <= 3 ? `${estimatedPages}` : 
-                      `${estimatedPages-1}-${estimatedPages+1}`;
-
-  // Calculate file size
-  const fileSizeBytes = Buffer.byteLength(htmlContent, 'utf8');
-  const fileSizeMB = (fileSizeBytes / (1024 * 1024)).toFixed(1);
-
-  return {
-    tableCount,
-    assetCount: Math.max(assetCount, 0),
-    estimatedPages: pageEstimate,
-    isValidCohenFormat: hasCohenBranding,
-    fileSize: `${fileSizeMB} MB`,
-  };
 }
 
 export function injectCohenStyles(htmlContent: string): string {

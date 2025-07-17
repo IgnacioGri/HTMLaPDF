@@ -11,13 +11,29 @@ import { generatePdf } from "./services/pdf-generator";
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
+    fileSize: 50 * 1024 * 1024, // 50MB limit for large reports
+    fieldSize: 50 * 1024 * 1024,
   },
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'text/html' || file.originalname.endsWith('.html') || file.originalname.endsWith('.htm')) {
+    console.log('File filter check:', {
+      originalname: file.originalname,
+      mimetype: file.mimetype,
+      fieldname: file.fieldname
+    });
+    
+    // Accept various HTML file types and mime types
+    const isHtmlFile = file.originalname.toLowerCase().endsWith('.html') || 
+                      file.originalname.toLowerCase().endsWith('.htm');
+    
+    const isHtmlMime = file.mimetype === 'text/html' || 
+                      file.mimetype === 'application/octet-stream' || 
+                      file.mimetype === 'text/plain' ||
+                      !file.mimetype; // Sometimes browsers don't set mime type correctly
+    
+    if (isHtmlFile || isHtmlMime) {
       cb(null, true);
     } else {
-      cb(new Error('Only HTML files are allowed'));
+      cb(new Error(`Invalid file type. Expected HTML file but got: ${file.mimetype}`));
     }
   },
 });
@@ -27,17 +43,32 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Analyze HTML file
   app.post("/api/analyze", upload.single('htmlFile'), async (req, res) => {
     try {
+      console.log("Analysis request received:");
+      console.log("- File present:", !!req.file);
+      console.log("- Body keys:", Object.keys(req.body));
+      console.log("- Files:", req.files);
+      
       if (!req.file) {
+        console.log("No file found in request");
         return res.status(400).json({ message: "No HTML file provided" });
       }
 
+      console.log("File details:", {
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size
+      });
+
       const htmlContent = req.file.buffer.toString('utf-8');
+      console.log("HTML content length:", htmlContent.length);
+      
       const analysis = analyzeHtml(htmlContent);
+      console.log("Analysis result:", analysis);
       
       res.json(analysis);
     } catch (error) {
       console.error("Analysis error:", error);
-      res.status(500).json({ message: "Failed to analyze HTML file" });
+      res.status(500).json({ message: "Failed to analyze HTML file", error: error instanceof Error ? error.message : String(error) });
     }
   });
 
