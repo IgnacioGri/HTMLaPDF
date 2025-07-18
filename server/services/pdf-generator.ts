@@ -114,70 +114,78 @@ export async function generatePdf(
 
 function generateCustomCSS(config: PdfConfig): string {
   return `
-    /* Professional PDF formatting - preserving original HTML style */
+    /* ULTRA AGGRESSIVE CSS - Use ENTIRE landscape page width */
     
     @page {
       size: A4 landscape;
-      margin: 0; /* Sin márgenes para usar toda la página */
+      margin: 2mm; /* Mínimo margen técnico */
+    }
+    
+    * {
+      box-sizing: border-box !important;
     }
     
     html, body {
       margin: 0 !important;
-      padding: 5px !important; /* Pequeño padding interno */
+      padding: 0 !important;
       width: 100% !important;
       height: 100% !important;
-      background: white;
-      font-family: inherit;
-      box-sizing: border-box !important;
+      font-family: Arial, sans-serif !important;
     }
     
-    /* Force tables to fill entire page width */
+    /* FORCE all containers to full width */
+    .container, .container-fluid, div, section {
+      width: 100% !important;
+      max-width: none !important;
+      padding: 1px !important;
+      margin: 0 !important;
+    }
+    
+    /* ULTRA WIDE TABLES - use every millimeter */
     table {
       width: 100% !important;
+      table-layout: fixed !important; /* Fixed para control total */
       border-collapse: collapse !important;
-      margin: 5px 0 !important;
-      table-layout: fixed !important;
-      font-size: 9px !important; /* Letra más grande como pediste */
+      margin: 3px 0 !important;
+      font-size: 8px !important; /* Tamaño para mostrar más columnas */
     }
     
-    /* Headers más grandes y legibles */
+    /* Headers compactos pero legibles */
     table th {
-      background-color: #d3d3d3 !important;
-      color: #000 !important;
+      background-color: #8B4A8C !important; /* Color morado original Cohen */
+      color: white !important;
       font-weight: bold !important;
       text-align: center !important;
-      padding: 4px 3px !important;
-      border: 1px solid #999 !important;
-      font-size: 10px !important; /* Letra más grande */
-      line-height: 1.2 !important;
-      width: auto !important; /* Ancho automático para mostrar todas las columnas */
+      padding: 2px 1px !important; /* Ultra compacto */
+      border: 0.5px solid #666 !important;
+      font-size: 8px !important;
+      line-height: 1.0 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
     }
     
-    /* Celdas más legibles */
+    /* Celdas ultra compactas */
     table td {
-      padding: 3px 2px !important;
-      border: 1px solid #ccc !important;
+      padding: 1px 0.5px !important; /* Mínimo padding */
+      border: 0.5px solid #ccc !important;
       vertical-align: top !important;
-      font-size: 9px !important; /* Letra más grande */
-      line-height: 1.1 !important;
-      word-wrap: break-word !important;
-      white-space: normal !important; /* Permitir wrap si es necesario */
-      width: auto !important; /* Ancho automático para mostrar todas las columnas */
+      font-size: 7px !important; /* Pequeño para mostrar todo */
+      line-height: 1.0 !important;
+      white-space: nowrap !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
     
-    /* Asegurar que TODAS las columnas se muestren */
-    table {
-      table-layout: auto !important; /* Auto para mostrar todas las columnas */
+    /* FORZAR distribución de columnas para mostrar TODAS */
+    table th, table td {
+      width: calc(100% / 20) !important; /* Distribuir equitativamente */
+      min-width: 0 !important;
+      max-width: none !important;
     }
     
-    table td, table th {
-      min-width: 40px !important; /* Ancho mínimo para legibilidad */
-      width: auto !important; /* Ancho automático */
-    }
-    
-    /* Contenedores que usen toda la página */
-    * {
-      box-sizing: border-box !important;
+    /* Primera columna más ancha para nombres */
+    table th:first-child, table td:first-child {
+      width: calc(100% / 8) !important; /* Más ancho para nombres */
     }
     
     /* Preserve original alternating row colors if they exist */
