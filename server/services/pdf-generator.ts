@@ -331,13 +331,13 @@ function generateCustomCSS(config: PdfConfig): string {
       color: white !important;
     }
     
-    /* Section headers - preserve original styling with better pagination */
+    /* Section headers - TIGHT layout to avoid blank pages */
     h1, h2, h3, h4, h5, h6 {
       font-weight: bold !important;
       color: inherit !important;
-      margin: 8px 0 5px 0 !important; /* Reduced margins */
+      margin: 3px 0 2px 0 !important; /* MINIMAL margins */
       page-break-after: avoid !important;
-      page-break-before: auto !important;
+      page-break-before: avoid !important; /* Avoid page breaks before titles */
     }
     
     /* Specific styling for common Cohen sections */
@@ -349,8 +349,9 @@ function generateCustomCSS(config: PdfConfig): string {
     *:contains("Detalle de actividad") {
       font-weight: bold !important;
       font-size: 12px !important;
-      margin: 6px 0 4px 0 !important; /* Tighter spacing */
+      margin: 2px 0 1px 0 !important; /* ULTRA tight spacing */
       page-break-after: avoid !important;
+      page-break-before: avoid !important; /* NO page breaks before sections */
     }
     
     /* Ensure table headers are always preserved and visible */
@@ -359,11 +360,12 @@ function generateCustomCSS(config: PdfConfig): string {
       break-inside: avoid !important;
     }
     
-    /* Keep section title with at least first 3 rows of content */
+    /* FORCE section titles to stay with content - NO blank pages */
     h1 + table, h2 + table, h3 + table, h4 + table, h5 + table, h6 + table,
-    .section-title + table {
+    .section-title + table, h1 + *, h2 + *, h3 + *, h4 + *, h5 + *, h6 + * {
       page-break-before: avoid !important;
       break-before: avoid !important;
+      margin-top: 0 !important; /* NO spacing between title and content */
     }
     
     /* Optimize page breaks for better content flow */
@@ -406,11 +408,12 @@ function generateCustomCSS(config: PdfConfig): string {
       }
     ` : ''}
     
-    /* Professional page break rules */
+    /* AGGRESSIVE anti-blank-page rules */
     @media print {
-      /* Avoid bad breaks */
+      /* Minimize page breaks */
       table {
         page-break-inside: auto;
+        page-break-before: avoid !important; /* Tables stick to previous content */
       }
       
       tr {
@@ -418,10 +421,17 @@ function generateCustomCSS(config: PdfConfig): string {
         page-break-after: auto;
       }
       
+      /* NO breaks between sections and content */
+      div, p, section {
+        page-break-after: avoid !important;
+        margin-bottom: 0 !important; /* Remove spacing that causes blank pages */
+      }
+      
       /* Typography improvements */
       p {
         orphans: 2;
         widows: 2;
+        margin: 1px 0 !important; /* Minimal paragraph spacing */
       }
       
       /* Better section spacing */
