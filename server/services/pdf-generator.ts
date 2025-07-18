@@ -118,7 +118,7 @@ function generateCustomCSS(config: PdfConfig): string {
     
     @page {
       size: A4 landscape; /* Horizontal orientation for more column space */
-      margin: 10mm 8mm 8mm 8mm; /* Optimized margins for landscape */
+      margin: 8mm 5mm 5mm 5mm; /* Minimal margins to use full width */
     }
     
     body {
@@ -126,19 +126,23 @@ function generateCustomCSS(config: PdfConfig): string {
       padding: 0;
       background: white;
       font-family: inherit; /* Keep original font */
+      width: 100% !important; /* Force full width usage */
+      max-width: 100% !important;
       ${config.contentScale !== 100 ? `
         transform: scale(${config.contentScale / 100});
         transform-origin: top left;
-        width: ${100 / (config.contentScale / 100)}%;
+        width: ${100 / (config.contentScale / 100)}% !important;
       ` : ''}
     }
     
-    /* Restore original table styling from HTML */
+    /* Force tables to use FULL landscape width */
     table {
       width: 100% !important;
+      max-width: 100% !important;
       border-collapse: collapse !important;
-      margin: 8px 0 15px 0; /* Reasonable spacing */
-      font-size: inherit; /* Keep original size */
+      margin: 3px 0 8px 0 !important; /* Minimal spacing */
+      table-layout: fixed !important; /* Fixed layout for precise control */
+      font-size: 8px !important; /* Base font size for tables */
     }
     
     /* Landscape-optimized table headers */
@@ -147,29 +151,24 @@ function generateCustomCSS(config: PdfConfig): string {
       color: #000 !important;
       font-weight: bold !important;
       text-align: center !important;
-      padding: 4px 3px !important; /* Better padding for landscape */
+      padding: 3px 2px !important; /* Compact padding for more columns */
       border: 1px solid #999 !important;
-      font-size: 10px !important; /* Readable header font */
-      line-height: 1.2 !important;
+      font-size: 9px !important; /* Readable header font */
+      line-height: 1.1 !important;
     }
     
     /* Landscape-optimized cell styling */
     table td {
-      padding: 2px 1.5px !important; /* Better padding for landscape */
+      padding: 2px 1px !important; /* Ultra-compact padding for maximum columns */
       border: 1px solid #ccc !important;
       vertical-align: top !important;
-      font-size: 9px !important; /* Readable font in landscape */
-      line-height: 1.1 !important; /* Good line height */
+      font-size: 8px !important; /* Compact font for more columns */
+      line-height: 1.0 !important; /* Tight line height */
       word-wrap: break-word !important;
       overflow-wrap: break-word !important;
-      white-space: normal !important; /* Allow wrapping when needed */
-    }
-    
-    /* Optimized column distribution - ensure ALL columns are visible */
-    table {
-      table-layout: auto !important; /* Allow flexible column sizing */
-      width: 100% !important;
-      font-size: 8px !important; /* Base font size for tables */
+      white-space: nowrap !important; /* No wrapping for compact columns */
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
     
     /* Landscape column distribution - more space for ALL columns */
