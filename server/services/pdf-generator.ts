@@ -19,6 +19,20 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     // Update job status to processing
     await storage.updateConversionJobStatus(jobId, "processing");
     
+    // Optimize HTML for large files
+    let optimizedHtml = htmlContent;
+    if (contentSizeKB > 500) { // If file is larger than 500KB
+      console.log('Optimizing large HTML content...');
+      // Remove unnecessary CSS and JavaScript that might slow down processing
+      optimizedHtml = htmlContent
+        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '') // Remove scripts
+        .replace(/style="[^"]*"/gi, '') // Remove inline styles that conflict
+        .replace(/class="ql-[^"]*"/gi, 'class=""') // Simplify Quill editor classes
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+      console.log('HTML optimized from', Math.round(contentSizeKB), 'KB to', Math.round(optimizedHtml.length / 1024), 'KB');
+    }
+
     // Inject custom styles for Cohen reports
     const styledHtml = `
     <!DOCTYPE html>
@@ -30,17 +44,24 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
       </style>
     </head>
     <body>
-      ${htmlContent}
+      ${optimizedHtml}
     </body>
     </html>
     `;
     
     console.log('Environment:', process.env.NODE_ENV);
+    console.log('HTML content size:', htmlContent.length, 'characters');
     console.log('Launching Puppeteer browser...');
+    
+    // Set timeout based on content size - larger files need more time
+    const contentSizeKB = htmlContent.length / 1024;
+    const baseTimeout = 30000; // 30 seconds base
+    const dynamicTimeout = Math.min(120000, baseTimeout + (contentSizeKB * 100)); // Max 2 minutes
+    console.log('Dynamic timeout set to:', dynamicTimeout, 'ms for', Math.round(contentSizeKB), 'KB content');
     
     const launchOptions = {
       headless: true,
-      timeout: 30000,
+      timeout: dynamicTimeout,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -171,19 +192,22 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     
     const page = await browser.newPage();
     
-    // Set page timeout
-    page.setDefaultTimeout(60000);
+    // Set page timeout based on content size
+    page.setDefaultTimeout(dynamicTimeout);
     
-    // Set content with timeout
+    console.log('Setting page content for large file...');
+    // Set content with dynamic timeout for large files
     await page.setContent(styledHtml, {
       waitUntil: 'domcontentloaded',
-      timeout: 10000
+      timeout: dynamicTimeout
     });
     
-    // Add table classes for dynamic font sizing
+    console.log('Optimizing tables for large content...');
+    // Add table classes for dynamic font sizing - limit processing for large files
     await page.evaluate(() => {
       const tables = document.querySelectorAll('table');
-      for (let i = 0; i < Math.min(tables.length, 50); i++) {
+      const maxTables = tables.length > 100 ? 30 : 50; // Limit processing for very large files
+      for (let i = 0; i < Math.min(tables.length, maxTables); i++) {
         const table = tables[i];
         const headerRow = table.querySelector('tr');
         if (headerRow) {
