@@ -80,8 +80,8 @@ export async function generatePdf(
       displayHeaderFooter: false,
       preferCSSPageSize: true,
       scale: 1.0, // Don't use config.contentScale here, we'll handle it in CSS
-      width: '210mm', // A4 width
-      height: '297mm', // A4 height
+      width: '297mm', // A4 landscape width  
+      height: '210mm', // A4 landscape height
     };
     
     // Generate filename
@@ -118,31 +118,37 @@ function generateCustomCSS(config: PdfConfig): string {
     
     @page {
       size: A4 landscape; /* Horizontal orientation for more column space */
-      margin: 8mm 5mm 5mm 5mm; /* Minimal margins to use full width */
+      margin: 5mm 3mm 3mm 3mm; /* Ultra-minimal margins for maximum width */
     }
     
     body {
-      margin: 0;
-      padding: 0;
+      margin: 0 !important;
+      padding: 0 !important;
       background: white;
-      font-family: inherit; /* Keep original font */
-      width: 100% !important; /* Force full width usage */
-      max-width: 100% !important;
+      font-family: inherit;
+      width: 100vw !important; /* Use full viewport width */
+      max-width: none !important;
+      overflow-x: visible !important;
+      box-sizing: border-box !important;
       ${config.contentScale !== 100 ? `
         transform: scale(${config.contentScale / 100});
         transform-origin: top left;
-        width: ${100 / (config.contentScale / 100)}% !important;
+        width: ${100 / (config.contentScale / 100)}vw !important;
       ` : ''}
     }
     
-    /* Force tables to use FULL landscape width */
+    /* AGGRESSIVE: Force tables to use every pixel of landscape width */
     table {
       width: 100% !important;
-      max-width: 100% !important;
+      max-width: none !important;
+      min-width: 100% !important;
       border-collapse: collapse !important;
-      margin: 3px 0 8px 0 !important; /* Minimal spacing */
-      table-layout: fixed !important; /* Fixed layout for precise control */
-      font-size: 8px !important; /* Base font size for tables */
+      margin: 2px 0 5px 0 !important;
+      table-layout: fixed !important; /* Fixed for precise control */
+      font-size: 7px !important; /* Smaller to fit more columns */
+      box-sizing: border-box !important;
+      transform: scaleX(1.1) !important; /* Stretch horizontally beyond 100% */
+      transform-origin: left !important;
     }
     
     /* Landscape-optimized table headers */
@@ -171,29 +177,25 @@ function generateCustomCSS(config: PdfConfig): string {
       text-overflow: ellipsis !important;
     }
     
-    /* Landscape column distribution - more space for ALL columns */
-    table td:nth-child(1), table th:nth-child(1) { width: 9% !important; }
-    table td:nth-child(2), table th:nth-child(2) { width: 7% !important; }
-    table td:nth-child(3), table th:nth-child(3) { width: 6.5% !important; }
-    table td:nth-child(4), table th:nth-child(4) { width: 7% !important; }
-    table td:nth-child(5), table th:nth-child(5) { width: 7% !important; }
-    table td:nth-child(6), table th:nth-child(6) { width: 6.5% !important; }
-    table td:nth-child(7), table th:nth-child(7) { width: 7.5% !important; }
-    table td:nth-child(8), table th:nth-child(8) { width: 7% !important; }
-    table td:nth-child(9), table th:nth-child(9) { width: 6.5% !important; }
-    table td:nth-child(10), table th:nth-child(10) { width: 7% !important; }
-    table td:nth-child(11), table th:nth-child(11) { width: 7% !important; }
-    table td:nth-child(12), table th:nth-child(12) { width: 6.5% !important; }
-    table td:nth-child(13), table th:nth-child(13) { width: 6.5% !important; }
-    table td:nth-child(14), table th:nth-child(14) { width: 6.5% !important; }
-    table td:nth-child(15), table th:nth-child(15) { width: 6% !important; }
-    table td:nth-child(16), table th:nth-child(16) { width: 6% !important; }
+    /* Distribute ALL columns evenly across FULL landscape width */
+    table td, table th {
+      width: calc(100% / var(--column-count, 20)) !important; /* Dynamic even distribution */
+      min-width: 0 !important;
+      max-width: none !important;
+      padding: 1px 0.5px !important; /* Ultra-compact for maximum columns */
+      font-size: 6px !important; /* Even smaller for extreme column fitting */
+    }
     
-    /* Remaining columns with better spacing in landscape */
-    table td:nth-child(n+17), table th:nth-child(n+17) { 
-      width: auto !important; 
-      min-width: 5.5% !important; 
-      font-size: 8px !important;
+    /* Force containers to use full page width */
+    * {
+      box-sizing: border-box !important;
+    }
+    
+    html, body, div, table, .table-container {
+      width: 100% !important;
+      max-width: none !important;
+      margin: 0 !important;
+      padding: 0 !important;
     }
     
     /* Preserve original alternating row colors if they exist */
