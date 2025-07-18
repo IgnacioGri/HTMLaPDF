@@ -327,7 +327,8 @@ async function generatePdfFallback(htmlContent: string, config: PdfConfig, jobId
         left: config.margin?.left || '5mm'
       },
       printBackground: true,
-      preferCSSPageSize: false
+      preferCSSPageSize: false,
+      timeout: 60000 // 60 seconds timeout
     };
     
     // Enhanced HTML with Cohen styling for fallback
@@ -353,8 +354,27 @@ async function generatePdfFallback(htmlContent: string, config: PdfConfig, jobId
     `;
     
     const file = { content: fallbackStyledHtml };
+    console.log('📄 Generating PDF with html-pdf-node...');
     const pdfBuffer = await htmlPdf.generatePdf(file, options);
+    
+    // Validate that we actually got a PDF buffer
+    if (!pdfBuffer || pdfBuffer.length === 0) {
+      throw new Error('Generated PDF buffer is empty');
+    }
+    
+    // Check if it's actually a PDF by looking for PDF signature
+    const pdfSignature = pdfBuffer.toString('ascii', 0, 4);
+    if (!pdfSignature.startsWith('%PDF')) {
+      throw new Error('Generated file is not a valid PDF');
+    }
+    
     await fs.writeFile(fallbackOutputPath, pdfBuffer);
+    
+    // Double-check the file was written correctly
+    const stats = await fs.stat(fallbackOutputPath);
+    if (stats.size === 0) {
+      throw new Error('Written PDF file is empty');
+    }
     
     // Update job status to completed
     await storage.updateConversionJobStatus(jobId, "completed");
@@ -372,46 +392,100 @@ async function generateSimplePdfFallback(htmlContent: string, config: PdfConfig,
   console.log('🔄 Using simple PDF fallback...');
   
   try {
+    // Try to use a system PDF generation tool as last resort
+    const { execSync } = await import('child_process');
+    
     const filename = `Reporte${Date.now()}.pdf`;
     const simpleOutputPath = path.join(PDF_OUTPUT_DIR, filename);
+    const htmlPath = path.join(PDF_OUTPUT_DIR, `temp_${Date.now()}.html`);
     
-    // Create a simple HTML file with print-friendly styles
-    const simplePdfHtml = `
+    // Create a clean HTML file
+    const cleanHtml = `
       <!DOCTYPE html>
       <html>
       <head>
         <meta charset="UTF-8">
         <style>
-          @media print {
-            @page { size: A4 landscape; margin: 5mm; }
-            body { font-family: Arial, sans-serif; margin: 0; padding: 0; width: 100%; }
-            table { width: 100%; border-collapse: collapse; margin: 2px 0; font-size: 10px; }
-            table th, table td { padding: 2px 4px; border: 1px solid #ccc; vertical-align: top; }
-            table thead { display: table-header-group; background-color: #f5f5f5; }
-            .blue-text, .title-blue { color: #0066cc; }
-            .container { max-width: 100%; overflow: hidden; }
-          }
+          @page { size: A4 landscape; margin: 5mm; }
+          body { font-family: Arial, sans-serif; margin: 0; padding: 0; width: 100%; }
+          table { width: 100%; border-collapse: collapse; margin: 2px 0; font-size: 10px; }
+          table th, table td { padding: 2px 4px; border: 1px solid #ccc; vertical-align: top; }
+          table thead { display: table-header-group; background-color: #f5f5f5; }
+          .blue-text, .title-blue { color: #0066cc; }
+          .container { max-width: 100%; overflow: hidden; }
         </style>
       </head>
       <body>
         ${htmlContent}
-        <script>
-          window.onload = function() {
-            window.print();
-          };
-        </script>
       </body>
       </html>
     `;
     
-    // Save as HTML file (user can print to PDF)
-    await fs.writeFile(simpleOutputPath.replace('.pdf', '.html'), simplePdfHtml);
+    // Write temporary HTML file
+    await fs.writeFile(htmlPath, cleanHtml);
+    
+    // Try different system tools for PDF generation
+    const pdfCommands = [
+      `wkhtmltopdf --page-size A4 --orientation Landscape --margin-top 5mm --margin-right 5mm --margin-bottom 5mm --margin-left 5mm "${htmlPath}" "${simpleOutputPath}"`,
+      `chromium-browser --headless --disable-gpu --print-to-pdf="${simpleOutputPath}" --print-to-pdf-no-header "${htmlPath}"`,
+      `google-chrome --headless --disable-gpu --print-to-pdf="${simpleOutputPath}" --print-to-pdf-no-header "${htmlPath}"`
+    ];
+    
+    let pdfGenerated = false;
+    for (const command of pdfCommands) {
+      try {
+        console.log(`🔄 Trying: ${command.split(' ')[0]}`);
+        execSync(command, { stdio: 'pipe' });
+        
+        // Check if PDF was created
+        await fs.access(simpleOutputPath);
+        pdfGenerated = true;
+        console.log('✅ PDF generated with system tool');
+        break;
+      } catch (error) {
+        console.log(`❌ ${command.split(' ')[0]} failed`);
+      }
+    }
+    
+    // Clean up temp HTML file
+    try {
+      await fs.unlink(htmlPath);
+    } catch (error) {
+      // Ignore cleanup errors
+    }
+    
+    if (!pdfGenerated) {
+      // Generate a simple text-based report as final fallback
+      const textContent = htmlContent
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/\s+/g, ' ') // Normalize whitespace
+        .trim();
+      
+      const textReport = `
+REPORTE COHEN - GENERADO EN MODO TEXTO
+=====================================
+Fecha: ${new Date().toLocaleDateString()}
+Nota: Este reporte fue generado en modo texto debido a limitaciones del sistema.
+
+${textContent}
+
+=====================================
+Fin del reporte
+      `;
+      
+      const textPath = simpleOutputPath.replace('.pdf', '.txt');
+      await fs.writeFile(textPath, textReport);
+      
+      await storage.updateConversionJobStatus(jobId, "completed");
+      console.log('✅ Text report generated as final fallback');
+      return textPath;
+    }
     
     // Update job status to completed
     await storage.updateConversionJobStatus(jobId, "completed");
     
-    console.log('✅ Simple PDF fallback generated');
-    return simpleOutputPath.replace('.pdf', '.html');
+    console.log('✅ Simple PDF fallback completed');
+    return simpleOutputPath;
     
   } catch (error) {
     console.error('💥 Simple PDF fallback failed:', error);
