@@ -223,42 +223,63 @@ export async function generatePdf(
           });
         }
         
-        // SURGICAL: Remove problematic footer rows during page breaks
-        const allRows = table.querySelectorAll('tr');
-        allRows.forEach((row, index) => {
-          const cellText = row.textContent || '';
+        // CRITICAL: Keep totals but prevent repetition during page breaks
+        const tbody = table.querySelector('tbody');
+        if (tbody) {
+          const allRows = tbody.querySelectorAll('tr');
+          let totalRows = [];
           
-          // If this row contains "TOTAL" text, mark it for special handling
-          if (cellText.includes('TOTAL INVERSIONES') || cellText.includes('TOTAL ') || 
-              cellText.includes('total ') || cellText.includes('Total ')) {
-            
-            // CRITICAL: Prevent this row from appearing in page breaks
+          // Find all total rows
+          allRows.forEach((row, index) => {
+            const cellText = row.textContent || '';
+            if (cellText.includes('TOTAL INVERSIONES') || cellText.includes('TOTAL ') || 
+                cellText.includes('total ') || cellText.includes('Total ')) {
+              totalRows.push({row, index});
+            }
+          });
+          
+          // Handle each total row
+          totalRows.forEach(({row, index}) => {
+            // FORCE this total to stay at the very end of its section
             row.style.setProperty('page-break-before', 'avoid', 'important');
             row.style.setProperty('break-before', 'avoid', 'important');
-            row.style.setProperty('page-break-after', 'avoid', 'important');
-            row.style.setProperty('break-after', 'avoid', 'important');
+            row.style.setProperty('page-break-inside', 'avoid', 'important');
+            row.style.setProperty('break-inside', 'avoid', 'important');
             
-            // Force this row to stay with previous content
-            row.style.setProperty('orphans', '0', 'important');
-            row.style.setProperty('widows', '0', 'important');
-            
-            // Add special class for CSS targeting
-            row.classList.add('total-row-no-repeat');
-            
-            // Ensure at least 5 previous rows stay with this total
-            for (let i = Math.max(0, index - 5); i < index; i++) {
+            // Ensure previous rows don't break away from total
+            for (let i = Math.max(0, index - 10); i < index; i++) {
               if (allRows[i]) {
                 allRows[i].style.setProperty('page-break-after', 'avoid', 'important');
                 allRows[i].style.setProperty('break-after', 'avoid', 'important');
               }
             }
-          }
-        });
+            
+            // Mark the total row for special CSS handling
+            row.classList.add('keep-with-content');
+          });
+        }
         
-        // Also handle tfoot if present
+        // Disable any tfoot repetition
         const tfoot = table.querySelector('tfoot');
         if (tfoot) {
-          tfoot.style.setProperty('display', 'none', 'important');
+          // Convert tfoot to tbody row at the end
+          const tfootContent = tfoot.innerHTML;
+          const newRow = document.createElement('tr');
+          newRow.innerHTML = tfootContent;
+          newRow.classList.add('converted-footer', 'keep-with-content');
+          
+          // Style the converted footer
+          newRow.style.setProperty('background-color', '#112964', 'important');
+          newRow.style.setProperty('color', 'white', 'important');
+          newRow.style.setProperty('font-weight', 'bold', 'important');
+          newRow.style.setProperty('page-break-before', 'avoid', 'important');
+          newRow.style.setProperty('break-before', 'avoid', 'important');
+          
+          // Add to tbody and remove tfoot
+          if (tbody) {
+            tbody.appendChild(newRow);
+          }
+          tfoot.remove();
         }
         
         // Allow tbody to break naturally
