@@ -94,7 +94,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const job = await storage.createConversionJob(jobData);
       
       // Start PDF generation in background
-      generatePdf(job.id, htmlContent, config)
+      generatePdf(htmlContent, config, job.id)
         .then(async (pdfPath) => {
           await storage.updateConversionJobStatus(job.id, "completed", pdfPath);
         })
