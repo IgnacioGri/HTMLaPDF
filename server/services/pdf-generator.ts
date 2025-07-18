@@ -71,10 +71,10 @@ export async function generatePdf(
       format: config.pageSize as any,
       landscape: config.orientation === 'landscape',
       margin: {
-        top: `${config.marginTop}mm`,
-        right: `${config.marginSide}mm`,
-        bottom: `${config.marginTop}mm`,
-        left: `${config.marginSide}mm`,
+        top: '0mm',
+        right: '0mm', 
+        bottom: '0mm',
+        left: '0mm',
       },
       printBackground: true,
       displayHeaderFooter: false,
@@ -117,85 +117,67 @@ function generateCustomCSS(config: PdfConfig): string {
     /* Professional PDF formatting - preserving original HTML style */
     
     @page {
-      size: A4 landscape; /* Horizontal orientation for more column space */
-      margin: 3mm 1mm 1mm 1mm; /* Extreme minimal margins for absolute maximum width */
+      size: A4 landscape;
+      margin: 0; /* Sin márgenes para usar toda la página */
     }
     
-    body {
+    html, body {
       margin: 0 !important;
-      padding: 0 !important;
+      padding: 5px !important; /* Pequeño padding interno */
+      width: 100% !important;
+      height: 100% !important;
       background: white;
       font-family: inherit;
-      width: 105% !important; /* Exceed 100% to eliminate right margin */
-      max-width: none !important;
-      overflow-x: hidden !important; /* Hide any overflow */
       box-sizing: border-box !important;
-      ${config.contentScale !== 100 ? `
-        transform: scale(${config.contentScale / 100});
-        transform-origin: top left;
-        width: ${100 / (config.contentScale / 100)}vw !important;
-      ` : ''}
     }
     
-    /* AGGRESSIVE: Force tables to use every pixel of landscape width */
+    /* Force tables to fill entire page width */
     table {
       width: 100% !important;
-      max-width: none !important;
-      min-width: 100% !important;
       border-collapse: collapse !important;
-      margin: 2px 0 5px 0 !important;
-      table-layout: fixed !important; /* Fixed for precise control */
-      font-size: 7px !important; /* Smaller to fit more columns */
-      box-sizing: border-box !important;
-      transform: scaleX(1.15) !important; /* Stretch even more to fill right margin */
-      transform-origin: left !important;
+      margin: 5px 0 !important;
+      table-layout: fixed !important;
+      font-size: 9px !important; /* Letra más grande como pediste */
     }
     
-    /* Landscape-optimized table headers */
+    /* Headers más grandes y legibles */
     table th {
-      background-color: #d3d3d3 !important; /* Original gray headers */
+      background-color: #d3d3d3 !important;
       color: #000 !important;
       font-weight: bold !important;
       text-align: center !important;
-      padding: 3px 2px !important; /* Compact padding for more columns */
+      padding: 4px 3px !important;
       border: 1px solid #999 !important;
-      font-size: 9px !important; /* Readable header font */
-      line-height: 1.1 !important;
+      font-size: 10px !important; /* Letra más grande */
+      line-height: 1.2 !important;
+      width: auto !important; /* Ancho automático para mostrar todas las columnas */
     }
     
-    /* Landscape-optimized cell styling */
+    /* Celdas más legibles */
     table td {
-      padding: 2px 1px !important; /* Ultra-compact padding for maximum columns */
+      padding: 3px 2px !important;
       border: 1px solid #ccc !important;
       vertical-align: top !important;
-      font-size: 8px !important; /* Compact font for more columns */
-      line-height: 1.0 !important; /* Tight line height */
+      font-size: 9px !important; /* Letra más grande */
+      line-height: 1.1 !important;
       word-wrap: break-word !important;
-      overflow-wrap: break-word !important;
-      white-space: nowrap !important; /* No wrapping for compact columns */
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
+      white-space: normal !important; /* Permitir wrap si es necesario */
+      width: auto !important; /* Ancho automático para mostrar todas las columnas */
     }
     
-    /* Distribute ALL columns evenly across FULL landscape width */
+    /* Asegurar que TODAS las columnas se muestren */
+    table {
+      table-layout: auto !important; /* Auto para mostrar todas las columnas */
+    }
+    
     table td, table th {
-      width: calc(100% / var(--column-count, 20)) !important; /* Dynamic even distribution */
-      min-width: 0 !important;
-      max-width: none !important;
-      padding: 1px 0.5px !important; /* Ultra-compact for maximum columns */
-      font-size: 6px !important; /* Even smaller for extreme column fitting */
+      min-width: 40px !important; /* Ancho mínimo para legibilidad */
+      width: auto !important; /* Ancho automático */
     }
     
-    /* Force containers to use full page width */
+    /* Contenedores que usen toda la página */
     * {
       box-sizing: border-box !important;
-    }
-    
-    html, body, div, table, .table-container {
-      width: 100% !important;
-      max-width: none !important;
-      margin: 0 !important;
-      padding: 0 !important;
     }
     
     /* Preserve original alternating row colors if they exist */
