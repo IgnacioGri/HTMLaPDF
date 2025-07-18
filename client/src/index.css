@@ -13,7 +13,7 @@
   --card-foreground: hsl(210, 15%, 20%);
   --border: hsl(210, 20%, 90%);
   --input: hsl(210, 20%, 90%);
-  --primary: hsl(325, 28%, 42%);
+  --primary: hsl(355, 67%, 45%);
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(210, 10%, 96%);
   --secondary-foreground: hsl(210, 15%, 10%);
@@ -21,7 +21,7 @@
   --accent-foreground: hsl(210, 15%, 10%);
   --destructive: hsl(0, 84%, 60%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(325, 28%, 42%);
+  --ring: hsl(355, 67%, 45%);
   --radius: 0.75rem;
   
   /* Cohen-specific colors - replicating real app */
@@ -46,7 +46,7 @@
   --card-foreground: hsl(0, 0%, 98%);
   --border: hsl(210, 15%, 15%);
   --input: hsl(210, 15%, 15%);
-  --primary: hsl(325, 28%, 42%);
+  --primary: hsl(355, 67%, 45%);
   --primary-foreground: hsl(0, 0%, 100%);
   --secondary: hsl(210, 15%, 15%);
   --secondary-foreground: hsl(0, 0%, 98%);
@@ -54,7 +54,7 @@
   --accent-foreground: hsl(0, 0%, 98%);
   --destructive: hsl(0, 63%, 31%);
   --destructive-foreground: hsl(0, 0%, 98%);
-  --ring: hsl(325, 28%, 42%);
+  --ring: hsl(355, 67%, 45%);
 }
 
 @layer base {
