@@ -180,6 +180,65 @@ export async function generatePdf(
         el.classList.remove('mt-4');
         el.style.setProperty('margin-top', '2px', 'important');
       });
+      
+      // CRITICAL: Force header repetition on ALL tables
+      const allTables = document.querySelectorAll('table');
+      allTables.forEach(table => {
+        // Enhanced table styling for proper pagination
+        table.style.setProperty('width', '100%', 'important');
+        table.style.setProperty('border-collapse', 'collapse', 'important');
+        table.style.setProperty('font-size', '11px', 'important');
+        table.style.setProperty('line-height', '1.2', 'important');
+        
+        // Allow table to break across pages
+        table.style.setProperty('page-break-inside', 'auto', 'important');
+        table.style.setProperty('break-inside', 'auto', 'important');
+        
+        // Force header repetition on ALL tables
+        const thead = table.querySelector('thead');
+        if (thead) {
+          thead.style.setProperty('background-color', '#112964', 'important');
+          thead.style.setProperty('color', 'white', 'important');
+          thead.style.setProperty('font-weight', 'bold', 'important');
+          
+          // CRITICAL: Force header group display for repetition
+          thead.style.setProperty('display', 'table-header-group', 'important');
+          thead.style.setProperty('break-inside', 'avoid', 'important');
+          thead.style.setProperty('page-break-inside', 'avoid', 'important');
+          
+          // Ensure all header rows repeat
+          const headerRows = thead.querySelectorAll('tr');
+          headerRows.forEach(row => {
+            row.style.setProperty('break-inside', 'avoid', 'important');
+            row.style.setProperty('page-break-inside', 'avoid', 'important');
+            row.style.setProperty('display', 'table-row', 'important');
+          });
+          
+          // Ensure all header cells repeat
+          const headerCells = thead.querySelectorAll('th, td');
+          headerCells.forEach(cell => {
+            cell.style.setProperty('break-inside', 'avoid', 'important');
+            cell.style.setProperty('page-break-inside', 'avoid', 'important');
+            cell.style.setProperty('display', 'table-cell', 'important');
+          });
+        }
+        
+        // Allow tbody to break naturally
+        const tbody = table.querySelector('tbody');
+        if (tbody) {
+          tbody.style.setProperty('break-inside', 'auto', 'important');
+          tbody.style.setProperty('page-break-inside', 'auto', 'important');
+        }
+        
+        // Style all table cells for better readability
+        const cells = table.querySelectorAll('td, th');
+        cells.forEach(cell => {
+          cell.style.setProperty('padding', '4px 6px', 'important');
+          cell.style.setProperty('border', '1px solid #ddd', 'important');
+          cell.style.setProperty('vertical-align', 'top', 'important');
+          cell.style.setProperty('font-size', '10px', 'important');
+        });
+      });
     });
     
     // Add custom CSS for better table handling
@@ -499,23 +558,34 @@ function generateCustomCSS(config: PdfConfig): string {
       padding-top: 0 !important;
     }
     
-    /* NUCLEAR OPTION: Disable ALL page breaks */
-    * {
+    /* STRATEGIC page breaks: Allow only table breaks, avoid section breaks */
+    .container, .card, .card-body {
       page-break-before: avoid !important;
       page-break-after: avoid !important;
-      page-break-inside: avoid !important;
       break-before: avoid !important;
       break-after: avoid !important;
+    }
+    
+    /* CRITICAL: Enable table header repetition on ALL tables */
+    thead, thead tr, thead th, thead td {
       break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      display: table-header-group !important;
     }
     
-    /* Force everything into a single flowing document */
-    html, body {
-      height: auto !important;
-      overflow: visible !important;
+    /* Force table headers to repeat on page breaks */
+    table {
+      break-inside: auto !important;
+      page-break-inside: auto !important;
     }
     
-    /* Ultra-compact layout */
+    /* Ensure table body allows breaks but headers repeat */
+    tbody {
+      break-inside: auto !important;
+      page-break-inside: auto !important;
+    }
+    
+    /* Ultra-compact layout for sections */
     .container {
       max-width: 100% !important;
       margin: 0 !important;
