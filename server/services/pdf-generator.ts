@@ -212,6 +212,7 @@ function generateCustomCSS(config: PdfConfig): string {
       overflow: visible !important;
       text-overflow: unset !important; /* Sin truncamiento */
       word-wrap: break-word !important; /* Romper palabras largas si es necesario */
+      color: white !important; /* Texto blanco para headers */
     }
     
     table.small-table td {
@@ -236,6 +237,7 @@ function generateCustomCSS(config: PdfConfig): string {
       font-size: 9px !important;
       padding: 3px 2px !important;
       line-height: 1.1 !important;
+      color: white !important; /* Texto blanco para headers */
     }
     
     table.medium-table td {
@@ -259,6 +261,7 @@ function generateCustomCSS(config: PdfConfig): string {
       white-space: nowrap !important; /* Mantener nowrap en tablas grandes */
       overflow: hidden !important;
       text-overflow: ellipsis !important;
+      color: white !important; /* Texto blanco para headers */
     }
     
     table.large-table td {
@@ -320,6 +323,12 @@ function generateCustomCSS(config: PdfConfig): string {
     
     tbody tr:nth-child(odd) {
       background-color: white !important;
+    }
+    
+    /* Headers con fondo marrón tienen texto blanco */
+    th[style*="background"], th[class*="bg-"], .table-dark th,
+    .bg-custom-reporte-mensual th, .bg-custom-reporte-mensual {
+      color: white !important;
     }
     
     /* Section headers - preserve original styling with better pagination */
