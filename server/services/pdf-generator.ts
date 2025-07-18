@@ -283,7 +283,6 @@ export async function generatePdf(
         }
         
         // Allow tbody to break naturally
-        const tbody = table.querySelector('tbody');
         if (tbody) {
           tbody.style.setProperty('break-inside', 'auto', 'important');
           tbody.style.setProperty('page-break-inside', 'auto', 'important');
