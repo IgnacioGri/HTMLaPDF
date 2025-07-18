@@ -23,8 +23,19 @@ export async function generatePdf(
     // Update job status to processing
     await storage.updateConversionJobStatus(jobId, "processing");
     
+    // Preprocess HTML to eliminate problematic spacing structures
+    let processedHTML = htmlContent;
+    
+    // Remove excessive spacing around "Rendimiento por activo" sections
+    processedHTML = processedHTML.replace(/class="container mt-4"/g, 'class="container" style="margin-top:0px!important"');
+    processedHTML = processedHTML.replace(/class="m-1 mb-0"/g, 'class="m-0" style="margin:0px!important"');
+    
+    // Remove empty divs that create spacing
+    processedHTML = processedHTML.replace(/<div[^>]*>\s*<\/div>/g, '');
+    processedHTML = processedHTML.replace(/\s{3,}/g, ' ');
+    
     // Inject Cohen-specific styles
-    const styledHtml = injectCohenStyles(htmlContent);
+    const styledHtml = injectCohenStyles(processedHTML);
     
     // Launch browser with Replit-optimized settings
     console.log('Launching Puppeteer browser...');
