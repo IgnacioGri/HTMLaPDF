@@ -331,13 +331,13 @@ function generateCustomCSS(config: PdfConfig): string {
       color: white !important;
     }
     
-    /* Section headers - TIGHT layout to avoid blank pages */
+    /* Section headers - BALANCED spacing */
     h1, h2, h3, h4, h5, h6 {
       font-weight: bold !important;
       color: inherit !important;
-      margin: 3px 0 2px 0 !important; /* MINIMAL margins */
+      margin: 10px 0 4px 0 !important; /* Moderate top margin, tight bottom */
       page-break-after: avoid !important;
-      page-break-before: avoid !important; /* Avoid page breaks before titles */
+      page-break-before: auto !important; /* Allow natural breaks but avoid orphans */
     }
     
     /* Specific styling for common Cohen sections */
@@ -349,9 +349,9 @@ function generateCustomCSS(config: PdfConfig): string {
     *:contains("Detalle de actividad") {
       font-weight: bold !important;
       font-size: 12px !important;
-      margin: 2px 0 1px 0 !important; /* ULTRA tight spacing */
+      margin: 8px 0 3px 0 !important; /* Breathing room above, tight below */
       page-break-after: avoid !important;
-      page-break-before: avoid !important; /* NO page breaks before sections */
+      page-break-before: auto !important; /* Natural breaks allowed */
     }
     
     /* Ensure table headers are always preserved and visible */
@@ -360,12 +360,18 @@ function generateCustomCSS(config: PdfConfig): string {
       break-inside: avoid !important;
     }
     
-    /* FORCE section titles to stay with content - NO blank pages */
+    /* Keep titles with their content - smart orphan prevention */
     h1 + table, h2 + table, h3 + table, h4 + table, h5 + table, h6 + table,
-    .section-title + table, h1 + *, h2 + *, h3 + *, h4 + *, h5 + *, h6 + * {
+    .section-title + table {
       page-break-before: avoid !important;
       break-before: avoid !important;
-      margin-top: 0 !important; /* NO spacing between title and content */
+      margin-top: 2px !important; /* Minimal but visible spacing */
+    }
+    
+    /* Prevent orphaned titles at bottom of page */
+    h1, h2, h3, h4, h5, h6 {
+      orphans: 3 !important; /* Need at least 3 lines of content after title */
+      page-break-inside: avoid !important;
     }
     
     /* Optimize page breaks for better content flow */
@@ -421,17 +427,21 @@ function generateCustomCSS(config: PdfConfig): string {
         page-break-after: auto;
       }
       
-      /* NO breaks between sections and content */
+      /* Controlled spacing between sections */
       div, p, section {
-        page-break-after: avoid !important;
-        margin-bottom: 0 !important; /* Remove spacing that causes blank pages */
+        margin-bottom: 6px !important; /* Small but visible spacing */
       }
       
       /* Typography improvements */
       p {
         orphans: 2;
         widows: 2;
-        margin: 1px 0 !important; /* Minimal paragraph spacing */
+        margin: 4px 0 !important; /* Readable paragraph spacing */
+      }
+      
+      /* Space between major sections */
+      table + h1, table + h2, table + h3 {
+        margin-top: 15px !important; /* Breathing room between sections */
       }
       
       /* Better section spacing */
