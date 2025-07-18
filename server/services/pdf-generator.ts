@@ -360,26 +360,34 @@ function generateCustomCSS(config: PdfConfig): string {
       break-inside: avoid !important;
     }
     
-    /* FORCE titles to stay with content - especially for large documents */
-    h1 + table, h2 + table, h3 + table, h4 + table, h5 + table, h6 + table,
-    .section-title + table {
-      page-break-before: avoid !important;
-      break-before: avoid !important;
-    }
-    
-    /* Specific rules for problematic sections in large documents */
-    *:contains("Rendimiento por activo") + table,
-    *:contains("Rendimiento por activo") + * + table,
-    *:contains("Rendimiento por activo") + * + * + table {
-      page-break-before: avoid !important;
-      break-before: avoid !important;
-    }
-    
-    /* Force grouping for investment sections */
-    *:contains("Rendimiento por activo") {
+    /* SPECIFIC ATTACK on "Rendimiento por activo" structure */
+    .bg-custom-reporte-mensual {
       page-break-after: avoid !important;
+      break-after: avoid !important;
       page-break-inside: avoid !important;
-      keep-with-next: always !important;
+      break-inside: avoid !important;
+    }
+    
+    /* Force the card containing "Rendimiento por activo" to stay together */
+    .bg-custom-reporte-mensual + .m-1,
+    .bg-custom-reporte-mensual + .m-1 .card-body,
+    .bg-custom-reporte-mensual + .m-1 .tabsGenericos,
+    .bg-custom-reporte-mensual + .m-1 .row {
+      page-break-before: avoid !important;
+      break-before: avoid !important;
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+    
+    /* Ultra-compact containers - simplified without :has() */
+    .container.mt-4 {
+      margin-top: 4px !important; /* Minimal spacing */
+    }
+    
+    /* Force all content after Cohen headers to stick */
+    .bg-custom-reporte-mensual ~ * {
+      page-break-before: avoid !important;
+      break-before: avoid !important;
     }
     
     /* Optimize page breaks for better content flow */
@@ -434,12 +442,30 @@ function generateCustomCSS(config: PdfConfig): string {
         page-break-after: auto;
       }
       
-      /* AGGRESSIVE orphan prevention for large documents */
+      /* ULTRA-AGGRESSIVE orphan prevention */
       h1, h2, h3, h4, h5, h6 {
-        orphans: 4 !important; /* Need 4 lines of content after title */
-        widows: 2 !important;
+        orphans: 8 !important; /* Force MINIMUM 8 lines after title */
+        widows: 4 !important;
         page-break-after: avoid !important;
         break-after: avoid !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      
+      /* Force titles to stick with next 3 elements */
+      h1 + *, h2 + *, h3 + *, h4 + *, h5 + *, h6 + * {
+        page-break-before: avoid !important;
+        break-before: avoid !important;
+      }
+      
+      h1 + * + *, h2 + * + *, h3 + * + *, h4 + * + *, h5 + * + *, h6 + * + * {
+        page-break-before: avoid !important;
+        break-before: avoid !important;
+      }
+      
+      h1 + * + * + *, h2 + * + * + *, h3 + * + * + *, h4 + * + * + *, h5 + * + * + *, h6 + * + * + * {
+        page-break-before: avoid !important;
+        break-before: avoid !important;
       }
       
       /* Typography improvements */
