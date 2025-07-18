@@ -64,6 +64,7 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     // Try multiple Chrome executable paths
     const possiblePaths = [
       process.env.PUPPETEER_EXECUTABLE_PATH,
+      '/home/runner/workspace/.cache/puppeteer/chrome/linux-138.0.7204.157/chrome-linux64/chrome',
       '/home/runner/.cache/puppeteer/chrome/linux-138.0.7204.157/chrome-linux64/chrome',
       '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium'
     ].filter(Boolean);
@@ -98,6 +99,20 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
       }
     }
     
+    // Try to use system Chrome/Chromium
+    if (!executablePath) {
+      try {
+        const { execSync } = await import('child_process');
+        const systemChrome = execSync('which chromium || which google-chrome || which chrome 2>/dev/null', { encoding: 'utf8' }).trim();
+        if (systemChrome) {
+          executablePath = systemChrome;
+          console.log(`Found system Chrome: ${executablePath}`);
+        }
+      } catch (error) {
+        console.log('System Chrome search failed:', error.message);
+      }
+    }
+    
     if (executablePath) {
       launchOptions.executablePath = executablePath;
       console.log(`Using Chrome executable: ${executablePath}`);
@@ -109,9 +124,45 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
       browser = await puppeteer.launch(launchOptions);
     } catch (error) {
       console.error('Failed to launch browser with custom path:', error.message);
-      // Fallback: try without specifying executable path
-      delete launchOptions.executablePath;
-      browser = await puppeteer.launch(launchOptions);
+      console.error('Attempting fallback approaches...');
+      
+      // Multiple fallback attempts
+      const fallbackAttempts = [
+        () => {
+          console.log('Trying without executable path...');
+          const opts = { ...launchOptions };
+          delete opts.executablePath;
+          return puppeteer.launch(opts);
+        },
+        () => {
+          console.log('Trying with minimal args...');
+          return puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox']
+          });
+        },
+        () => {
+          console.log('Trying with bundled Chromium...');
+          return puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+          });
+        }
+      ];
+      
+      for (const attempt of fallbackAttempts) {
+        try {
+          browser = await attempt();
+          console.log('Fallback browser launch successful');
+          break;
+        } catch (fallbackError) {
+          console.error('Fallback attempt failed:', fallbackError.message);
+        }
+      }
+      
+      if (!browser) {
+        throw new Error('All browser launch attempts failed');
+      }
     }
     console.log('Browser launched successfully');
     
