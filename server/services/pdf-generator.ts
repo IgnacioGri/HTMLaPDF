@@ -47,12 +47,12 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     ].filter(Boolean);
     
     let executablePath;
-    const fs = await import('fs/promises');
+    const fs2 = await import('fs/promises');
     
     // Try exact paths
     for (const path of possiblePaths) {
       try {
-        await fs.access(path);
+        await fs2.access(path);
         executablePath = path;
         console.log(`Found Chrome at: ${path}`);
         break;
