@@ -82,6 +82,50 @@ export async function generatePdf(
           table.setAttribute('data-columns', columnCount.toString());
         }
       });
+      
+      // AGGRESSIVE DOM manipulation for "Rendimiento por activo"
+      const rendimientoHeaders = Array.from(document.querySelectorAll('.bg-custom-reporte-mensual')).filter(el => 
+        el.textContent && el.textContent.includes('Rendimiento por activo')
+      );
+      
+      rendimientoHeaders.forEach(header => {
+        const container = header.closest('.container');
+        if (container) {
+          // Force zero spacing
+          container.style.setProperty('margin-top', '0px', 'important');
+          container.style.setProperty('margin-bottom', '0px', 'important');
+          container.style.setProperty('page-break-inside', 'avoid', 'important');
+          
+          // Find next sibling content
+          const nextContent = container.nextElementSibling;
+          if (nextContent) {
+            nextContent.style.setProperty('page-break-before', 'avoid', 'important');
+            nextContent.style.setProperty('margin-top', '0px', 'important');
+          }
+          
+          // Find card-body and stick it
+          const cardBody = container.querySelector('.card-body');
+          if (cardBody) {
+            cardBody.style.setProperty('page-break-before', 'avoid', 'important');
+            cardBody.style.setProperty('margin-top', '0px', 'important');
+            cardBody.style.setProperty('padding-top', '2px', 'important');
+          }
+          
+          // Force all tables in section to stick
+          const tables = container.querySelectorAll('table');
+          tables.forEach(table => {
+            table.style.setProperty('page-break-before', 'avoid', 'important');
+            table.style.setProperty('margin-top', '0px', 'important');
+          });
+        }
+      });
+      
+      // Remove all mt-4 classes and replace with minimal spacing
+      const mtContainers = document.querySelectorAll('.mt-4');
+      mtContainers.forEach(el => {
+        el.classList.remove('mt-4');
+        el.style.setProperty('margin-top', '2px', 'important');
+      });
     });
     
     // Add custom CSS for better table handling
