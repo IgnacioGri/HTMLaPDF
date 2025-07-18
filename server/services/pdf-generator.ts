@@ -268,9 +268,8 @@ export async function generatePdf(
           newRow.innerHTML = tfootContent;
           newRow.classList.add('converted-footer', 'keep-with-content');
           
-          // Style the converted footer
-          newRow.style.setProperty('background-color', '#112964', 'important');
-          newRow.style.setProperty('color', 'white', 'important');
+          // Keep original styling or use readable defaults
+          // Remove any forced background colors to preserve HTML styling
           newRow.style.setProperty('font-weight', 'bold', 'important');
           newRow.style.setProperty('page-break-before', 'avoid', 'important');
           newRow.style.setProperty('break-before', 'avoid', 'important');
@@ -647,11 +646,13 @@ function generateCustomCSS(config: PdfConfig): string {
       widows: 0 !important;
     }
     
-    /* Style converted footers to match original */
+    /* Style converted footers - preserve original colors or ensure readability */
     .converted-footer {
-      background-color: #112964 !important;
-      color: white !important;
       font-weight: bold !important;
+      /* Remove forced background colors to preserve HTML styling */
+      /* If no background, use white background with black text for readability */
+      background-color: white !important;
+      color: black !important;
     }
     
     /* Prevent sections from breaking before totals */
