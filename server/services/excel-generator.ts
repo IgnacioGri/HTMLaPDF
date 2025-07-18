@@ -54,6 +54,24 @@ export async function generateExcelFromHtml(htmlContent: string, originalFilenam
     const worksheet = workbook.addWorksheet(finalSheetName);
     sheetsCreated++;
     
+    // Add title directly above the table if found
+    let titleFound = false;
+    // Use existing prevElements from sheet name logic above
+    for (let i = 0; i < prevElements.length; i++) {
+      const text = $(prevElements[i]).text().trim();
+      if (text.length > 0 && text.length < 200) { // Accept longer titles
+        worksheet.addRow([text]);
+        const titleRow = worksheet.getRow(1);
+        titleRow.font = { bold: true, size: 14 };
+        titleRow.alignment = { horizontal: 'center' };
+        titleFound = true;
+        break;
+      }
+    }
+    
+    // Determine starting row for table data
+    const startRow = titleFound ? 2 : 1;
+    
     // Process table rows
     rows.forEach((row, rowIndex) => {
       const $row = $(row);
@@ -61,7 +79,7 @@ export async function generateExcelFromHtml(htmlContent: string, originalFilenam
       
       if (cells.length === 0) return;
       
-      const excelRow = worksheet.getRow(rowIndex + 1);
+      const excelRow = worksheet.getRow(rowIndex + startRow);
       
       cells.forEach((cell, cellIndex) => {
         const $cell = $(cell);
@@ -108,8 +126,9 @@ export async function generateExcelFromHtml(htmlContent: string, originalFilenam
       }
     });
     
-    // Freeze header row
-    worksheet.views = [{ state: 'frozen', ypane: 1 }];
+    // Freeze header row (adjust for title if present)
+    const freezeRow = titleFound ? 2 : 1;
+    worksheet.views = [{ state: 'frozen', ypane: freezeRow }];
   });
   
   // If no tables found, create a summary sheet
