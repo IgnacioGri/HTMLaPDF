@@ -118,7 +118,7 @@ function generateCustomCSS(config: PdfConfig): string {
     
     @page {
       size: A4 landscape; /* Horizontal orientation for more column space */
-      margin: 5mm 3mm 3mm 3mm; /* Ultra-minimal margins for maximum width */
+      margin: 3mm 1mm 1mm 1mm; /* Extreme minimal margins for absolute maximum width */
     }
     
     body {
@@ -126,9 +126,9 @@ function generateCustomCSS(config: PdfConfig): string {
       padding: 0 !important;
       background: white;
       font-family: inherit;
-      width: 100vw !important; /* Use full viewport width */
+      width: 105% !important; /* Exceed 100% to eliminate right margin */
       max-width: none !important;
-      overflow-x: visible !important;
+      overflow-x: hidden !important; /* Hide any overflow */
       box-sizing: border-box !important;
       ${config.contentScale !== 100 ? `
         transform: scale(${config.contentScale / 100});
@@ -147,7 +147,7 @@ function generateCustomCSS(config: PdfConfig): string {
       table-layout: fixed !important; /* Fixed for precise control */
       font-size: 7px !important; /* Smaller to fit more columns */
       box-sizing: border-box !important;
-      transform: scaleX(1.1) !important; /* Stretch horizontally beyond 100% */
+      transform: scaleX(1.15) !important; /* Stretch even more to fill right margin */
       transform-origin: left !important;
     }
     
