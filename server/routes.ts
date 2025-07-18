@@ -7,6 +7,7 @@ import { storage } from "./storage";
 import { insertConversionJobSchema, pdfConfigSchema } from "@shared/schema";
 import { analyzeHtml } from "./services/html-parser";
 import { generatePdf } from "./services/pdf-generator";
+import { generateExcelFromHtml } from "./services/excel-generator";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -150,6 +151,33 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Download error:", error);
       res.status(500).json({ message: "Failed to download PDF" });
+    }
+  });
+
+  // Export to Excel
+  app.post("/api/export-excel", upload.single('htmlFile'), async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No HTML file provided" });
+      }
+
+      const htmlContent = req.file.buffer.toString('utf-8');
+      const originalFilename = req.file.originalname;
+
+      console.log(`Starting Excel export for file: ${originalFilename}`);
+      
+      const excelResult = await generateExcelFromHtml(htmlContent, originalFilename);
+      
+      console.log(`Excel export completed: ${excelResult.sheetsCreated} sheets created`);
+
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="${excelResult.filename}"`);
+      res.setHeader('Content-Length', excelResult.buffer.length.toString());
+      
+      res.send(excelResult.buffer);
+    } catch (error) {
+      console.error("Excel export error:", error);
+      res.status(500).json({ message: `Failed to export to Excel: ${error.message}` });
     }
   });
 

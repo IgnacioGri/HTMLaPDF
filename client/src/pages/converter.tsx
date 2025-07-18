@@ -3,6 +3,7 @@ import Header from "@/components/header";
 import FileUpload from "@/components/file-upload";
 import ConfigSimple from "@/components/config-simple";
 import PdfPreview from "@/components/pdf-preview";
+import { ExcelExportButton } from "@/components/excel-export-button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
@@ -68,6 +69,14 @@ export default function ConverterPage() {
               file={uploadedFile}
               analysis={analysis}
             />
+            
+            {/* Excel Export Button */}
+            {uploadedFile && (
+              <ExcelExportButton 
+                uploadedFile={uploadedFile}
+                disabled={false}
+              />
+            )}
 
             {/* Quick Stats */}
             <Card>

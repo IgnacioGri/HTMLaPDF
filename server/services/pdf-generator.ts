@@ -117,8 +117,8 @@ function generateCustomCSS(config: PdfConfig): string {
     /* Professional PDF formatting - preserving original HTML style */
     
     @page {
-      size: A4;
-      margin: 12mm 8mm 10mm 8mm; /* Ultra-tight margins for maximum column space */
+      size: A4 landscape; /* Horizontal orientation for more column space */
+      margin: 10mm 8mm 8mm 8mm; /* Optimized margins for landscape */
     }
     
     body {
@@ -141,30 +141,28 @@ function generateCustomCSS(config: PdfConfig): string {
       font-size: inherit; /* Keep original size */
     }
     
-    /* Preserve original table header styling */
+    /* Landscape-optimized table headers */
     table th {
       background-color: #d3d3d3 !important; /* Original gray headers */
       color: #000 !important;
       font-weight: bold !important;
       text-align: center !important;
-      padding: 3px 2px !important; /* Reduced padding for compact rows */
+      padding: 4px 3px !important; /* Better padding for landscape */
       border: 1px solid #999 !important;
-      font-size: 10px !important; /* Increased font size */
-      line-height: 1.1 !important;
+      font-size: 10px !important; /* Readable header font */
+      line-height: 1.2 !important;
     }
     
-    /* Ultra-compact cell styling to fit more columns */
+    /* Landscape-optimized cell styling */
     table td {
-      padding: 1.5px 1px !important; /* Ultra-compact padding */
+      padding: 2px 1.5px !important; /* Better padding for landscape */
       border: 1px solid #ccc !important;
       vertical-align: top !important;
-      font-size: 8px !important; /* Smaller font to fit more columns */
-      line-height: 1.05 !important; /* Ultra-tight line height */
+      font-size: 9px !important; /* Readable font in landscape */
+      line-height: 1.1 !important; /* Good line height */
       word-wrap: break-word !important;
       overflow-wrap: break-word !important;
-      white-space: nowrap !important; /* Prevent wrapping in narrow columns */
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
+      white-space: normal !important; /* Allow wrapping when needed */
     }
     
     /* Optimized column distribution - ensure ALL columns are visible */
@@ -174,29 +172,29 @@ function generateCustomCSS(config: PdfConfig): string {
       font-size: 8px !important; /* Base font size for tables */
     }
     
-    /* Ultra-compact column distribution to fit ALL columns including last 3-4 */
-    table td:nth-child(1), table th:nth-child(1) { width: 8% !important; }
-    table td:nth-child(2), table th:nth-child(2) { width: 6.5% !important; }
-    table td:nth-child(3), table th:nth-child(3) { width: 6% !important; }
-    table td:nth-child(4), table th:nth-child(4) { width: 6.5% !important; }
-    table td:nth-child(5), table th:nth-child(5) { width: 6.5% !important; }
-    table td:nth-child(6), table th:nth-child(6) { width: 6% !important; }
-    table td:nth-child(7), table th:nth-child(7) { width: 7% !important; }
-    table td:nth-child(8), table th:nth-child(8) { width: 6.5% !important; }
-    table td:nth-child(9), table th:nth-child(9) { width: 6% !important; }
-    table td:nth-child(10), table th:nth-child(10) { width: 6.5% !important; }
-    table td:nth-child(11), table th:nth-child(11) { width: 6.5% !important; }
-    table td:nth-child(12), table th:nth-child(12) { width: 6% !important; }
-    table td:nth-child(13), table th:nth-child(13) { width: 6% !important; }
-    table td:nth-child(14), table th:nth-child(14) { width: 6% !important; }
+    /* Landscape column distribution - more space for ALL columns */
+    table td:nth-child(1), table th:nth-child(1) { width: 9% !important; }
+    table td:nth-child(2), table th:nth-child(2) { width: 7% !important; }
+    table td:nth-child(3), table th:nth-child(3) { width: 6.5% !important; }
+    table td:nth-child(4), table th:nth-child(4) { width: 7% !important; }
+    table td:nth-child(5), table th:nth-child(5) { width: 7% !important; }
+    table td:nth-child(6), table th:nth-child(6) { width: 6.5% !important; }
+    table td:nth-child(7), table th:nth-child(7) { width: 7.5% !important; }
+    table td:nth-child(8), table th:nth-child(8) { width: 7% !important; }
+    table td:nth-child(9), table th:nth-child(9) { width: 6.5% !important; }
+    table td:nth-child(10), table th:nth-child(10) { width: 7% !important; }
+    table td:nth-child(11), table th:nth-child(11) { width: 7% !important; }
+    table td:nth-child(12), table th:nth-child(12) { width: 6.5% !important; }
+    table td:nth-child(13), table th:nth-child(13) { width: 6.5% !important; }
+    table td:nth-child(14), table th:nth-child(14) { width: 6.5% !important; }
     table td:nth-child(15), table th:nth-child(15) { width: 6% !important; }
-    table td:nth-child(16), table th:nth-child(16) { width: 5.5% !important; }
+    table td:nth-child(16), table th:nth-child(16) { width: 6% !important; }
     
-    /* Force remaining columns to be visible */
+    /* Remaining columns with better spacing in landscape */
     table td:nth-child(n+17), table th:nth-child(n+17) { 
-      width: 5% !important; 
-      min-width: 4% !important; 
-      font-size: 7px !important;
+      width: auto !important; 
+      min-width: 5.5% !important; 
+      font-size: 8px !important;
     }
     
     /* Preserve original alternating row colors if they exist */
