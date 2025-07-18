@@ -32,37 +32,12 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     </html>
     `;
     
+    console.log('Environment:', process.env.NODE_ENV);
     console.log('Launching Puppeteer browser...');
-    
-    // Try multiple Chrome executable paths
-    const possiblePaths = [
-      process.env.PUPPETEER_EXECUTABLE_PATH,
-      '/home/runner/.cache/puppeteer/chrome/linux-138.0.7204.157/chrome-linux64/chrome',
-      '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
-      '/usr/bin/google-chrome',
-      '/usr/bin/chromium-browser',
-      '/usr/bin/chrome',
-      '/usr/bin/chromium',
-      '/snap/bin/chromium'
-    ].filter(Boolean);
-    
-    let executablePath;
-    const fs2 = await import('fs/promises');
-    
-    // Try exact paths
-    for (const path of possiblePaths) {
-      try {
-        await fs2.access(path);
-        executablePath = path;
-        console.log(`Found Chrome at: ${path}`);
-        break;
-      } catch (error) {
-        console.log(`Chrome not found at: ${path}`);
-      }
-    }
     
     const launchOptions = {
       headless: true,
+      timeout: 30000,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -80,18 +55,70 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
         '--disable-plugins',
         '--disable-web-security',
         '--disable-features=VizDisplayCompositor',
+        '--disable-extensions',
+        '--disable-default-apps',
         '--window-size=1920,1080'
       ]
     };
     
-    if (executablePath) {
-      launchOptions.executablePath = executablePath;
+    // Try multiple Chrome executable paths
+    const possiblePaths = [
+      process.env.PUPPETEER_EXECUTABLE_PATH,
+      '/home/runner/.cache/puppeteer/chrome/linux-138.0.7204.157/chrome-linux64/chrome',
+      '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium'
+    ].filter(Boolean);
+    
+    let executablePath;
+    const fs2 = await import('fs/promises');
+    
+    // Try to find Chrome executable
+    for (const path of possiblePaths) {
+      try {
+        await fs2.access(path);
+        executablePath = path;
+        console.log(`Found Chrome at: ${path}`);
+        break;
+      } catch (error) {
+        console.log(`Chrome not found at: ${path}`);
+      }
     }
     
-    browser = await puppeteer.launch(launchOptions);
+    // Try with Nix store glob pattern
+    if (!executablePath) {
+      try {
+        const { execSync } = await import('child_process');
+        const nixChrome = execSync('find /nix/store -name chromium -path "*/bin/chromium" 2>/dev/null | head -1', { encoding: 'utf8' }).trim();
+        if (nixChrome) {
+          await fs2.access(nixChrome);
+          executablePath = nixChrome;
+          console.log(`Found Chrome via find: ${executablePath}`);
+        }
+      } catch (error) {
+        console.log('Nix store search failed:', error.message);
+      }
+    }
+    
+    if (executablePath) {
+      launchOptions.executablePath = executablePath;
+      console.log(`Using Chrome executable: ${executablePath}`);
+    } else {
+      console.log('No Chrome executable found, using default Puppeteer');
+    }
+    
+    try {
+      browser = await puppeteer.launch(launchOptions);
+    } catch (error) {
+      console.error('Failed to launch browser with custom path:', error.message);
+      // Fallback: try without specifying executable path
+      delete launchOptions.executablePath;
+      browser = await puppeteer.launch(launchOptions);
+    }
     console.log('Browser launched successfully');
     
     const page = await browser.newPage();
+    
+    // Set page timeout
+    page.setDefaultTimeout(60000);
     
     // Set content with timeout
     await page.setContent(styledHtml, {
@@ -152,14 +179,26 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     
   } catch (error) {
     console.error('PDF generation error:', error);
-    await storage.updateConversionJobStatus(jobId, "failed");
+    console.error('Error stack:', error.stack);
+    
+    try {
+      await storage.updateConversionJobStatus(jobId, "failed");
+    } catch (statusError) {
+      console.error('Failed to update job status:', statusError);
+    }
     
     const errorMessage = `PDF generation temporarily unavailable due to system configuration issues.\n\nThe HTML analysis was successful and detected a valid Cohen report format with 20 tables and 68 financial assets.\n\nSystem error: ${error.message}\n\nThis is likely due to missing system dependencies for the browser engine in the current environment.`;
     
     throw new Error(errorMessage);
   } finally {
-    if (browser) {
-      await browser.close();
+    try {
+      if (browser) {
+        console.log('Closing browser...');
+        await browser.close();
+        console.log('Browser closed successfully');
+      }
+    } catch (closeError) {
+      console.error('Error closing browser:', closeError);
     }
   }
 }
