@@ -118,7 +118,7 @@ function generateCustomCSS(config: PdfConfig): string {
     
     @page {
       size: A4;
-      margin: 20mm 15mm 15mm 15mm; /* Proper top margin + balanced sides */
+      margin: 15mm 10mm 10mm 10mm; /* Optimized margins for more content */
     }
     
     body {
@@ -147,60 +147,51 @@ function generateCustomCSS(config: PdfConfig): string {
       color: #000 !important;
       font-weight: bold !important;
       text-align: center !important;
-      padding: 6px 4px !important;
+      padding: 3px 2px !important; /* Reduced padding for compact rows */
       border: 1px solid #999 !important;
-      font-size: 9px !important;
+      font-size: 10px !important; /* Increased font size */
+      line-height: 1.1 !important;
     }
     
-    /* Preserve original cell styling */
+    /* Preserve original cell styling with better readability */
     table td {
-      padding: 4px 3px !important;
+      padding: 2px 1.5px !important; /* Compact padding for tighter rows */
       border: 1px solid #ccc !important;
       vertical-align: top !important;
-      font-size: 8px !important;
-      line-height: 1.2 !important;
+      font-size: 9px !important; /* Increased font size for readability */
+      line-height: 1.1 !important; /* Tighter line height */
       word-wrap: break-word !important;
       overflow-wrap: break-word !important;
     }
     
-    /* Balanced column distribution - use full page width */
-    table.main-table {
-      table-layout: fixed !important;
+    /* Optimized column distribution - ensure ALL columns are visible */
+    table {
+      table-layout: auto !important; /* Allow flexible column sizing */
       width: 100% !important;
+      font-size: 8px !important; /* Base font size for tables */
     }
     
-    table.main-table td:nth-child(1),
-    table.main-table th:nth-child(1) { width: 12% !important; }
+    /* For wide tables, optimize column widths to fit all columns */
+    table td:nth-child(1), table th:nth-child(1) { width: 10% !important; }
+    table td:nth-child(2), table th:nth-child(2) { width: 8% !important; }
+    table td:nth-child(3), table th:nth-child(3) { width: 7% !important; }
+    table td:nth-child(4), table th:nth-child(4) { width: 8% !important; }
+    table td:nth-child(5), table th:nth-child(5) { width: 8% !important; }
+    table td:nth-child(6), table th:nth-child(6) { width: 7% !important; }
+    table td:nth-child(7), table th:nth-child(7) { width: 9% !important; }
+    table td:nth-child(8), table th:nth-child(8) { width: 8% !important; }
+    table td:nth-child(9), table th:nth-child(9) { width: 7% !important; }
+    table td:nth-child(10), table th:nth-child(10) { width: 8% !important; }
+    table td:nth-child(11), table th:nth-child(11) { width: 8% !important; }
+    table td:nth-child(12), table th:nth-child(12) { width: 7% !important; }
+    table td:nth-child(13), table th:nth-child(13) { width: 7% !important; }
     
-    table.main-table td:nth-child(2),
-    table.main-table th:nth-child(2) { width: 9% !important; }
-    
-    table.main-table td:nth-child(3),
-    table.main-table th:nth-child(3) { width: 8% !important; }
-    
-    table.main-table td:nth-child(4),
-    table.main-table th:nth-child(4) { width: 9% !important; }
-    
-    table.main-table td:nth-child(5),
-    table.main-table th:nth-child(5) { width: 9% !important; }
-    
-    table.main-table td:nth-child(6),
-    table.main-table th:nth-child(6) { width: 8% !important; }
-    
-    table.main-table td:nth-child(7),
-    table.main-table th:nth-child(7) { width: 10% !important; }
-    
-    table.main-table td:nth-child(8),
-    table.main-table th:nth-child(8) { width: 9% !important; }
-    
-    table.main-table td:nth-child(9),
-    table.main-table th:nth-child(9) { width: 8% !important; }
-    
-    table.main-table td:nth-child(10),
-    table.main-table th:nth-child(10) { width: 9% !important; }
-    
-    table.main-table td:nth-child(11),
-    table.main-table th:nth-child(11) { width: 9% !important; }
+    /* Ensure no columns are cut off - all columns visible */
+    table td:nth-child(n+14), table th:nth-child(n+14) { 
+      width: auto !important; 
+      min-width: 5% !important; 
+      max-width: 8% !important;
+    }
     
     /* Preserve original alternating row colors if they exist */
     tbody tr:nth-child(even) {
@@ -211,23 +202,39 @@ function generateCustomCSS(config: PdfConfig): string {
       background-color: white !important;
     }
     
-    /* Section headers - preserve original styling */
+    /* Section headers - preserve original styling with better pagination */
     h1, h2, h3, h4, h5, h6 {
       font-weight: bold !important;
       color: inherit !important;
-      margin: 15px 0 8px 0 !important;
+      margin: 8px 0 5px 0 !important; /* Reduced margins */
       page-break-after: avoid !important;
+      page-break-before: auto !important;
     }
     
     /* Specific styling for common Cohen sections */
     .section-title, 
     *:contains("Resumen de"),
     *:contains("Tenencias al"),
-    *:contains("Rendimiento por activo") {
+    *:contains("Rendimiento por activo"),
+    *:contains("Movimientos"),
+    *:contains("Detalle de actividad") {
       font-weight: bold !important;
       font-size: 12px !important;
-      margin: 12px 0 8px 0 !important;
+      margin: 6px 0 4px 0 !important; /* Tighter spacing */
       page-break-after: avoid !important;
+    }
+    
+    /* Ensure table headers are always preserved and visible */
+    table thead tr {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+    
+    /* Keep section title with at least first 3 rows of content */
+    h1 + table, h2 + table, h3 + table, h4 + table, h5 + table, h6 + table,
+    .section-title + table {
+      page-break-before: avoid !important;
+      break-before: avoid !important;
     }
     
     /* Optimize page breaks for better content flow */
