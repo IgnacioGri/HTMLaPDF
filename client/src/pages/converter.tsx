@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Header from "@/components/header";
 import FileUpload from "@/components/file-upload";
-import SimpleConfigPanel from "@/components/simple-config-panel";
+import ConfigSimple from "@/components/config-simple";
 import PdfPreview from "@/components/pdf-preview";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -54,7 +54,7 @@ export default function ConverterPage() {
               analysis={analysis}
             />
             
-            <SimpleConfigPanel 
+            <ConfigSimple 
               disabled={!uploadedFile}
               file={uploadedFile}
               onConversionStarted={handleConversionStarted}

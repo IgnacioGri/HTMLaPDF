@@ -1,43 +1,42 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { FileText, Download } from "lucide-react";
+import { Download } from "lucide-react";
 import { useState } from "react";
 import { convertToPdf } from "@/lib/api";
 import { useToast } from "@/hooks/use-toast";
-import type { PdfConfig } from "@shared/schema";
 
-interface SimpleConfigPanelProps {
+interface ConfigSimpleProps {
   disabled: boolean;
   file: File | null;
   onConversionStarted: (jobId: number) => void;
 }
 
-const DEFAULT_CONFIG: PdfConfig = {
-  pageSize: "A4",
-  orientation: "portrait",
-  marginTop: 3,
-  marginSide: 3,
-  repeatHeaders: true,
-  keepGroupsTogether: true,
-  alternateRowColors: true,
-  autoFitText: true,
-  contentScale: 85,
-};
-
-export default function SimpleConfigPanel({ 
+export default function ConfigSimple({ 
   disabled, 
   file, 
   onConversionStarted 
-}: SimpleConfigPanelProps) {
+}: ConfigSimpleProps) {
   const [isConverting, setIsConverting] = useState(false);
   const { toast } = useToast();
 
-  const handleConvert = async () => {
+  async function handleConvert() {
     if (!file) return;
 
     setIsConverting(true);
     try {
-      const result = await convertToPdf(file, DEFAULT_CONFIG);
+      const config = {
+        pageSize: "A4" as const,
+        orientation: "portrait" as const,
+        marginTop: 3,
+        marginSide: 3,
+        repeatHeaders: true,
+        keepGroupsTogether: true,
+        alternateRowColors: true,
+        autoFitText: true,
+        contentScale: 85,
+      };
+
+      const result = await convertToPdf(file, config);
       onConversionStarted(result.jobId);
       toast({
         title: "Conversión iniciada",
@@ -52,13 +51,12 @@ export default function SimpleConfigPanel({
     } finally {
       setIsConverting(false);
     }
-  };
+  }
 
   return (
     <Card>
       <div className="cohen-burgundy px-6 py-4">
-        <h2 className="text-white text-lg font-semibold flex items-center">
-          <FileText className="mr-3 h-5 w-5" />
+        <h2 className="text-white text-lg font-semibold">
           Generar PDF
         </h2>
       </div>
