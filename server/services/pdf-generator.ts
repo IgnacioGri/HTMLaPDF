@@ -181,13 +181,25 @@ export async function generatePdf(
         el.style.setProperty('margin-top', '2px', 'important');
       });
       
-      // CRITICAL: Force header repetition on ALL tables
+      // CRITICAL: Force header repetition on ALL tables with dynamic sizing
       const allTables = document.querySelectorAll('table');
       allTables.forEach(table => {
+        // Count columns in the table
+        const firstRow = table.querySelector('tr');
+        const columnCount = firstRow ? firstRow.querySelectorAll('th, td').length : 0;
+        
+        // Apply class based on column count for CSS targeting
+        if (columnCount <= 7) {
+          table.classList.add('small-table');
+        } else if (columnCount <= 14) {
+          table.classList.add('medium-table');
+        } else {
+          table.classList.add('large-table');
+        }
+        
         // Enhanced table styling for proper pagination
         table.style.setProperty('width', '100%', 'important');
         table.style.setProperty('border-collapse', 'collapse', 'important');
-        table.style.setProperty('font-size', '11px', 'important');
         table.style.setProperty('line-height', '1.2', 'important');
         
         // Allow table to break across pages
@@ -386,9 +398,9 @@ function generateCustomCSS(config: PdfConfig): string {
       margin: 3px 0 !important;
     }
     
-    /* DEFAULT: Tables with many columns (15+) - small font */
+    /* DEFAULT: Tables with many columns (15+) - very small font */
     table {
-      font-size: 7px !important;
+      font-size: 5px !important;
     }
     
     table th {
@@ -396,31 +408,31 @@ function generateCustomCSS(config: PdfConfig): string {
       color: white !important;
       font-weight: bold !important;
       text-align: center !important;
-      padding: 2px 1px !important;
+      padding: 1px 0.5px !important;
       border: 0.5px solid #666 !important;
-      font-size: 7px !important;
+      font-size: 5px !important;
       line-height: 1.0 !important;
       /* Removed white-space and overflow restrictions - will be controlled per table type */
     }
     
     table td {
-      padding: 1px 0.5px !important;
+      padding: 0.5px 0.25px !important;
       border: 0.5px solid #ccc !important;
       vertical-align: top !important;
-      font-size: 6px !important;
+      font-size: 4px !important;
       line-height: 1.0 !important;
       /* Removed white-space and overflow restrictions - will be controlled per table type */
     }
     
     /* SMALL TABLES: Less than 8 columns - bigger font and auto layout */
     table.small-table {
-      font-size: 11px !important;
+      font-size: 14px !important;
       table-layout: auto !important; /* Auto layout para que el contenido determine el ancho */
     }
     
     table.small-table th {
-      font-size: 11px !important;
-      padding: 4px 6px !important; /* Más padding horizontal */
+      font-size: 14px !important;
+      padding: 6px 8px !important; /* Más padding horizontal */
       line-height: 1.3 !important;
       white-space: normal !important; /* Permitir wrap completo */
       overflow: visible !important;
@@ -430,8 +442,8 @@ function generateCustomCSS(config: PdfConfig): string {
     }
     
     table.small-table td {
-      font-size: 10px !important;
-      padding: 4px 6px !important; /* Más padding horizontal */
+      font-size: 13px !important;
+      padding: 5px 7px !important; /* Más padding horizontal */
       line-height: 1.2 !important;
       white-space: normal !important; /* Permitir wrap completo */
       overflow: visible !important; /* Mostrar todo el texto */
@@ -443,19 +455,19 @@ function generateCustomCSS(config: PdfConfig): string {
     
     /* MEDIUM TABLES: 8-14 columns - medium font and auto layout */
     table.medium-table {
-      font-size: 9px !important;
+      font-size: 10px !important;
       table-layout: auto !important; /* Auto layout para balance */
     }
     
     table.medium-table th {
-      font-size: 9px !important;
+      font-size: 10px !important;
       padding: 3px 2px !important;
       line-height: 1.1 !important;
       color: white !important; /* Texto blanco para headers */
     }
     
     table.medium-table td {
-      font-size: 8px !important;
+      font-size: 9px !important;
       padding: 2px 1px !important;
       line-height: 1.0 !important;
       white-space: normal !important; /* Permitir wrap en tablas medianas también */
@@ -463,15 +475,15 @@ function generateCustomCSS(config: PdfConfig): string {
       color: #000000 !important; /* Color negro forzado para el texto */
     }
     
-    /* LARGE TABLES: 15+ columns - keep small font */
+    /* LARGE TABLES: 15+ columns - very small font for monetary values */
     table.large-table {
-      font-size: 7px !important;
+      font-size: 4px !important;
     }
     
     table.large-table th {
-      font-size: 7px !important;
-      padding: 2px 1px !important;
-      line-height: 1.0 !important;
+      font-size: 4px !important;
+      padding: 1px 0.25px !important;
+      line-height: 0.9 !important;
       white-space: nowrap !important; /* Mantener nowrap en tablas grandes */
       overflow: hidden !important;
       text-overflow: ellipsis !important;
@@ -479,9 +491,9 @@ function generateCustomCSS(config: PdfConfig): string {
     }
     
     table.large-table td {
-      font-size: 6px !important;
-      padding: 1px 0.5px !important;
-      line-height: 1.0 !important;
+      font-size: 3.5px !important;
+      padding: 0.5px 0.25px !important;
+      line-height: 0.9 !important;
       white-space: nowrap !important; /* Mantener nowrap en tablas grandes */
       overflow: hidden !important;
       text-overflow: ellipsis !important;
