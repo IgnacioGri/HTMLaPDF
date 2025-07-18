@@ -1,4 +1,4 @@
-import * as htmlPdf from 'html-pdf-node';
+const htmlPdf = require('html-pdf-node');
 import type { PdfConfig } from '../../shared/schema.js';
 
 export async function generatePdfWithFallback(
