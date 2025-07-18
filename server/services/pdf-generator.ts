@@ -210,12 +210,17 @@ function generateCustomCSS(config: PdfConfig): string {
       font-size: 11px !important;
       padding: 4px 3px !important;
       line-height: 1.2 !important;
+      white-space: normal !important; /* Permitir wrap del texto en headers */
+      overflow: visible !important;
     }
     
     table.small-table td {
       font-size: 10px !important;
       padding: 3px 2px !important;
       line-height: 1.1 !important;
+      white-space: normal !important; /* Permitir wrap del texto */
+      overflow: visible !important; /* Mostrar todo el texto */
+      text-overflow: clip !important; /* No cortar texto */
     }
     
     /* MEDIUM TABLES: 8-14 columns - medium font */
@@ -233,6 +238,8 @@ function generateCustomCSS(config: PdfConfig): string {
       font-size: 8px !important;
       padding: 2px 1px !important;
       line-height: 1.0 !important;
+      white-space: normal !important; /* Permitir wrap en tablas medianas también */
+      overflow: visible !important;
     }
     
     /* LARGE TABLES: 15+ columns - keep small font */
