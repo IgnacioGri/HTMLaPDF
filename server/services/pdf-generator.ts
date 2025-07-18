@@ -360,34 +360,45 @@ function generateCustomCSS(config: PdfConfig): string {
       break-inside: avoid !important;
     }
     
-    /* SPECIFIC ATTACK on "Rendimiento por activo" structure */
-    .bg-custom-reporte-mensual {
+    /* ULTRA-AGGRESSIVE cohesion for Cohen structure */
+    .bg-custom-reporte-mensual,
+    .card-header.bg-custom-reporte-mensual {
       page-break-after: avoid !important;
       break-after: avoid !important;
       page-break-inside: avoid !important;
       break-inside: avoid !important;
+      margin-bottom: 0 !important;
     }
     
-    /* Force the card containing "Rendimiento por activo" to stay together */
-    .bg-custom-reporte-mensual + .m-1,
-    .bg-custom-reporte-mensual + .m-1 .card-body,
-    .bg-custom-reporte-mensual + .m-1 .tabsGenericos,
-    .bg-custom-reporte-mensual + .m-1 .row {
+    /* Force EVERYTHING after Cohen headers to stick like glue */
+    .bg-custom-reporte-mensual + *,
+    .bg-custom-reporte-mensual ~ *,
+    .card-header.bg-custom-reporte-mensual + *,
+    .card-header.bg-custom-reporte-mensual ~ * {
       page-break-before: avoid !important;
       break-before: avoid !important;
+      margin-top: 0 !important;
+    }
+    
+    /* Zero spacing on containers */
+    .container.mt-4,
+    .container {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    
+    /* Force .card cohesion */
+    .card {
       page-break-inside: avoid !important;
       break-inside: avoid !important;
     }
     
-    /* Ultra-compact containers - simplified without :has() */
-    .container.mt-4 {
-      margin-top: 4px !important; /* Minimal spacing */
-    }
-    
-    /* Force all content after Cohen headers to stick */
-    .bg-custom-reporte-mensual ~ * {
+    /* Glue card-body to header */
+    .card-body {
       page-break-before: avoid !important;
       break-before: avoid !important;
+      margin-top: 0 !important;
+      padding-top: 0 !important;
     }
     
     /* Optimize page breaks for better content flow */
@@ -442,30 +453,29 @@ function generateCustomCSS(config: PdfConfig): string {
         page-break-after: auto;
       }
       
-      /* ULTRA-AGGRESSIVE orphan prevention */
+      /* EXTREME orphan prevention - ZERO tolerance */
       h1, h2, h3, h4, h5, h6 {
-        orphans: 8 !important; /* Force MINIMUM 8 lines after title */
-        widows: 4 !important;
+        orphans: 15 !important; /* Need MASSIVE content after title */
+        widows: 8 !important;
         page-break-after: avoid !important;
         break-after: avoid !important;
         page-break-inside: avoid !important;
         break-inside: avoid !important;
       }
       
-      /* Force titles to stick with next 3 elements */
-      h1 + *, h2 + *, h3 + *, h4 + *, h5 + *, h6 + * {
+      /* TOTAL cohesion - stick everything together */
+      h1 + *, h2 + *, h3 + *, h4 + *, h5 + *, h6 + *,
+      h1 + * + *, h2 + * + *, h3 + * + *, h4 + * + *, h5 + * + *, h6 + * + *,
+      h1 + * + * + *, h2 + * + * + *, h3 + * + * + *, h4 + * + * + *, h5 + * + * + *, h6 + * + * + *,
+      h1 + * + * + * + *, h2 + * + * + * + *, h3 + * + * + * + *, h4 + * + * + * + *, h5 + * + * + * + *, h6 + * + * + * + * {
         page-break-before: avoid !important;
         break-before: avoid !important;
       }
       
-      h1 + * + *, h2 + * + *, h3 + * + *, h4 + * + *, h5 + * + *, h6 + * + * {
-        page-break-before: avoid !important;
-        break-before: avoid !important;
-      }
-      
-      h1 + * + * + *, h2 + * + * + *, h3 + * + * + *, h4 + * + * + *, h5 + * + * + *, h6 + * + * + * {
-        page-break-before: avoid !important;
-        break-before: avoid !important;
+      /* Eliminate ALL empty space */
+      * {
+        margin-top: 0 !important;
+        margin-bottom: 2px !important;
       }
       
       /* Typography improvements */
