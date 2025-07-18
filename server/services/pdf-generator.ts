@@ -201,9 +201,10 @@ function generateCustomCSS(config: PdfConfig): string {
       text-overflow: ellipsis !important;
     }
     
-    /* SMALL TABLES: Less than 8 columns - bigger font */
+    /* SMALL TABLES: Less than 8 columns - bigger font and auto layout */
     table.small-table {
       font-size: 11px !important;
+      table-layout: auto !important; /* Auto layout para que el contenido determine el ancho */
     }
     
     table.small-table th {
@@ -223,9 +224,10 @@ function generateCustomCSS(config: PdfConfig): string {
       text-overflow: clip !important; /* No cortar texto */
     }
     
-    /* MEDIUM TABLES: 8-14 columns - medium font */
+    /* MEDIUM TABLES: 8-14 columns - medium font and auto layout */
     table.medium-table {
       font-size: 9px !important;
+      table-layout: auto !important; /* Auto layout para balance */
     }
     
     table.medium-table th {
@@ -259,27 +261,29 @@ function generateCustomCSS(config: PdfConfig): string {
       line-height: 1.0 !important;
     }
     
-    /* COLUMN DISTRIBUTION - Dynamic based on column count */
-    /* Small tables: wider columns with flexible first column */
+    /* COLUMN DISTRIBUTION - Auto width for small/medium, fixed for large */
+    /* Small tables: let content determine width naturally */
+    table.small-table th,
+    table.small-table td {
+      width: auto !important; /* Ancho automático basado en contenido */
+      min-width: 50px !important; /* Mínimo para legibilidad */
+    }
+    
     table.small-table th:first-child,
     table.small-table td:first-child {
-      width: 35% !important; /* Mucho más ancho para categorías largas */
+      min-width: 150px !important; /* Mínimo más generoso para categorías */
     }
     
-    table.small-table th:not(:first-child),
-    table.small-table td:not(:first-child) {
-      width: calc(65% / 6) !important; /* Distribute remaining space */
+    /* Medium tables: semi-flexible width */
+    table.medium-table th,
+    table.medium-table td {
+      width: auto !important; /* Ancho automático */
+      min-width: 40px !important;
     }
     
-    /* Medium tables: medium columns with flexible first column */
     table.medium-table th:first-child,
     table.medium-table td:first-child {
-      width: 25% !important; /* Ancho considerable para nombres */
-    }
-    
-    table.medium-table th:not(:first-child),
-    table.medium-table td:not(:first-child) {
-      width: calc(75% / 11) !important; /* Distribute remaining space */
+      min-width: 120px !important; /* Mínimo para nombres largos */
     }
     
     /* Large tables: small columns */
