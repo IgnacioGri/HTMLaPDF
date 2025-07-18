@@ -114,18 +114,18 @@ export async function generatePdf(
 
 function generateCustomCSS(config: PdfConfig): string {
   return `
-    /* Preserve original HTML appearance with minimal PDF optimizations */
+    /* Professional PDF formatting - preserving original HTML style */
     
     @page {
       size: A4;
-      margin: ${config.marginTop}mm ${config.marginSide}mm ${config.marginTop}mm ${config.marginSide}mm;
+      margin: 20mm 15mm 15mm 15mm; /* Proper top margin + balanced sides */
     }
     
-    /* Keep original fonts and styling, just optimize for print */
     body {
       margin: 0;
-      padding: 10px;
+      padding: 0;
       background: white;
+      font-family: inherit; /* Keep original font */
       ${config.contentScale !== 100 ? `
         transform: scale(${config.contentScale / 100});
         transform-origin: top left;
@@ -133,78 +133,146 @@ function generateCustomCSS(config: PdfConfig): string {
       ` : ''}
     }
     
-    /* Ensure tables are properly sized for all columns */
+    /* Restore original table styling from HTML */
     table {
       width: 100% !important;
       border-collapse: collapse !important;
-      table-layout: auto !important;
-      margin-bottom: 15px;
+      margin: 8px 0 15px 0; /* Reasonable spacing */
+      font-size: inherit; /* Keep original size */
     }
     
-    /* Preserve original cell styling with minor adjustments for visibility */
-    table td, table th {
+    /* Preserve original table header styling */
+    table th {
+      background-color: #d3d3d3 !important; /* Original gray headers */
+      color: #000 !important;
+      font-weight: bold !important;
+      text-align: center !important;
+      padding: 6px 4px !important;
+      border: 1px solid #999 !important;
+      font-size: 9px !important;
+    }
+    
+    /* Preserve original cell styling */
+    table td {
+      padding: 4px 3px !important;
+      border: 1px solid #ccc !important;
+      vertical-align: top !important;
+      font-size: 8px !important;
+      line-height: 1.2 !important;
       word-wrap: break-word !important;
       overflow-wrap: break-word !important;
-      hyphens: auto !important;
-      vertical-align: top !important;
     }
     
-    /* Ensure text is readable in print */
-    table td {
-      font-size: 8px !important;
-      padding: 3px 2px !important;
-      line-height: 1.2 !important;
+    /* Balanced column distribution - use full page width */
+    table.main-table {
+      table-layout: fixed !important;
+      width: 100% !important;
     }
     
-    table th {
-      font-size: 8px !important;
-      padding: 4px 3px !important;
-      line-height: 1.2 !important;
+    table.main-table td:nth-child(1),
+    table.main-table th:nth-child(1) { width: 12% !important; }
+    
+    table.main-table td:nth-child(2),
+    table.main-table th:nth-child(2) { width: 9% !important; }
+    
+    table.main-table td:nth-child(3),
+    table.main-table th:nth-child(3) { width: 8% !important; }
+    
+    table.main-table td:nth-child(4),
+    table.main-table th:nth-child(4) { width: 9% !important; }
+    
+    table.main-table td:nth-child(5),
+    table.main-table th:nth-child(5) { width: 9% !important; }
+    
+    table.main-table td:nth-child(6),
+    table.main-table th:nth-child(6) { width: 8% !important; }
+    
+    table.main-table td:nth-child(7),
+    table.main-table th:nth-child(7) { width: 10% !important; }
+    
+    table.main-table td:nth-child(8),
+    table.main-table th:nth-child(8) { width: 9% !important; }
+    
+    table.main-table td:nth-child(9),
+    table.main-table th:nth-child(9) { width: 8% !important; }
+    
+    table.main-table td:nth-child(10),
+    table.main-table th:nth-child(10) { width: 9% !important; }
+    
+    table.main-table td:nth-child(11),
+    table.main-table th:nth-child(11) { width: 9% !important; }
+    
+    /* Preserve original alternating row colors if they exist */
+    tbody tr:nth-child(even) {
+      background-color: #f9f9f9 !important;
     }
     
-    /* Optimize column distribution for wide tables */
-    table.main-table td:nth-child(1) { width: 8%; }
-    table.main-table td:nth-child(2) { width: 12%; }
-    table.main-table td:nth-child(3) { width: 10%; }
-    table.main-table td:nth-child(4) { width: 10%; }
-    table.main-table td:nth-child(5) { width: 10%; }
-    table.main-table td:nth-child(6) { width: 10%; }
-    table.main-table td:nth-child(7) { width: 10%; }
-    table.main-table td:nth-child(8) { width: 10%; }
-    table.main-table td:nth-child(9) { width: 10%; }
-    table.main-table td:nth-child(n+10) { width: auto; min-width: 6%; }
+    tbody tr:nth-child(odd) {
+      background-color: white !important;
+    }
     
-    /* Smart page breaks - preserve original content flow */
-    ${config.repeatHeaders ? `
-      @media print {
-        thead {
-          display: table-header-group !important;
-        }
-      }
-    ` : ''}
+    /* Section headers - preserve original styling */
+    h1, h2, h3, h4, h5, h6 {
+      font-weight: bold !important;
+      color: inherit !important;
+      margin: 15px 0 8px 0 !important;
+      page-break-after: avoid !important;
+    }
     
+    /* Specific styling for common Cohen sections */
+    .section-title, 
+    *:contains("Resumen de"),
+    *:contains("Tenencias al"),
+    *:contains("Rendimiento por activo") {
+      font-weight: bold !important;
+      font-size: 12px !important;
+      margin: 12px 0 8px 0 !important;
+      page-break-after: avoid !important;
+    }
+    
+    /* Optimize page breaks for better content flow */
     ${config.keepGroupsTogether ? `
       .investment-group,
-      .section-header,
-      .lote-section {
+      .section-header {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
       }
       
-      /* Keep detail rows with main rows */
+      /* Prevent orphaned section titles */
+      h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+      }
+      
+      /* Keep at least 3 rows with section title */
+      h1 + table, h2 + table, h3 + table, h4 + table, h5 + table, h6 + table {
+        page-break-before: avoid !important;
+        break-before: avoid !important;
+      }
+      
+      /* Keep lote details with main investment */
       tr.main-row + tr.detail-row {
         page-break-before: avoid !important;
         break-before: avoid !important;
       }
     ` : ''}
     
-    /* Basic page break optimization */
-    @media print {
-      h1, h2, h3, h4, h5, h6 {
-        page-break-after: avoid !important;
-        break-after: avoid !important;
+    ${config.repeatHeaders ? `
+      @media print {
+        thead {
+          display: table-header-group !important;
+        }
+        
+        table thead tr {
+          page-break-inside: avoid !important;
+          break-inside: avoid !important;
+        }
       }
-      
+    ` : ''}
+    
+    /* Professional page break rules */
+    @media print {
+      /* Avoid bad breaks */
       table {
         page-break-inside: auto;
       }
@@ -214,6 +282,13 @@ function generateCustomCSS(config: PdfConfig): string {
         page-break-after: auto;
       }
       
+      /* Typography improvements */
+      p {
+        orphans: 2;
+        widows: 2;
+      }
+      
+      /* Better section spacing */
       .avoid-break {
         page-break-inside: avoid !important;
         break-inside: avoid !important;

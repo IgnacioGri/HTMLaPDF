@@ -154,42 +154,56 @@ export function injectCohenStyles(htmlContent: string): string {
     }
   });
   
-  // Remove the old style tag if exists and replace with optimized one
-  $('style').remove();
+  // Preserve existing styles but add PDF optimizations
+  const existingStyles = $('style').html() || '';
   
-  // Inject minimal Cohen-specific CSS - main styling will come from generateCustomCSS
-  const cohenStyles = `
+  // Add minimal PDF-specific styles while preserving original appearance
+  const pdfOptimizations = `
     <style>
-      /* Basic Cohen branding - detailed styles applied via page.addStyleTag */
-      .cohen-header {
-        background-color: #8B0000 !important;
-        color: white !important;
-        padding: 8px 12px;
-        font-weight: 600;
-        text-align: center;
-      }
+      /* Preserve existing styles */
+      ${existingStyles}
       
-      /* Ensure all tables are marked for processing */
-      table {
-        border-collapse: collapse !important;
-        width: 100% !important;
-      }
-      
-      /* Initial sizing to prevent overflow */
-      body {
-        max-width: 210mm;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
+      /* PDF-specific optimizations only */
+      @media print {
+        * {
+          -webkit-print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
+        
+        body {
+          margin: 0 !important;
+          padding: 0 !important;
+        }
+        
+        table {
+          width: 100% !important;
+          border-collapse: collapse !important;
+        }
+        
+        /* Ensure table headers are visible */
+        table th {
+          background-color: #d3d3d3 !important;
+          color: #000 !important;
+          font-weight: bold !important;
+          border: 1px solid #999 !important;
+        }
+        
+        /* Preserve original table borders and styling */
+        table td {
+          border: 1px solid #ccc !important;
+        }
       }
     </style>
   `;
   
-  // Add styles to head
+  // Replace existing styles with optimized version
+  $('style').remove();
+  
+  // Add optimized styles to head
   if ($('head').length) {
-    $('head').append(cohenStyles);
+    $('head').append(pdfOptimizations);
   } else {
-    $('html').prepend(`<head>${cohenStyles}</head>`);
+    $('html').prepend(`<head>${pdfOptimizations}</head>`);
   }
   
   return $.html();
