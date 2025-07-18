@@ -134,23 +134,23 @@ export default function PdfPreview({ jobId, file, analysis }: PdfPreviewProps) {
         ) : analysis ? (
           <div className="space-y-4">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-medium text-blue-800 mb-2">Configuración actual:</h3>
+              <h3 className="font-medium text-blue-800 mb-2">Configuración optimizada para Cohen:</h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-blue-700">Página:</span>
-                  <span className="font-medium text-blue-800">{config.pageSize} {config.orientation}</span>
+                  <span className="font-medium text-blue-800">A4 vertical</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-blue-700">Márgenes:</span>
-                  <span className="font-medium text-blue-800">{config.marginTop}mm / {config.marginSide}mm</span>
+                  <span className="font-medium text-blue-800">3mm mínimos</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-blue-700">Escala:</span>
-                  <span className="font-medium text-blue-800">{config.contentScale}%</span>
+                  <span className="font-medium text-blue-800">85% optimizado</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-blue-700">Headers:</span>
-                  <span className="font-medium text-blue-800">{config.repeatHeaders ? 'Repetir' : 'No repetir'}</span>
+                  <span className="font-medium text-blue-800">Repetir en cada página</span>
                 </div>
               </div>
             </div>
