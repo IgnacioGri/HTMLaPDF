@@ -131,6 +131,32 @@ export async function generatePdf(
         }
       });
       
+      // TARGET: Final elimination of space between "Inversiones" and "Rendimiento por activo"
+      const inversionesHeaders = Array.from(document.querySelectorAll('.bg-custom-reporte-mensual')).filter(el => 
+        el.textContent && el.textContent.includes('Inversiones')
+      );
+      
+      inversionesHeaders.forEach(header => {
+        const container = header.closest('.container');
+        if (container) {
+          // Force this section to fill available space completely
+          container.style.setProperty('margin-bottom', '0px', 'important');
+          container.style.setProperty('padding-bottom', '0px', 'important');
+          
+          // Find the next container (should be Rendimiento por activo)
+          let nextContainer = container.nextElementSibling;
+          while (nextContainer && !nextContainer.querySelector('.bg-custom-reporte-mensual')) {
+            nextContainer = nextContainer.nextElementSibling;
+          }
+          
+          if (nextContainer) {
+            nextContainer.style.setProperty('page-break-before', 'avoid', 'important');
+            nextContainer.style.setProperty('margin-top', '0px', 'important');
+            nextContainer.style.setProperty('padding-top', '0px', 'important');
+          }
+        }
+      });
+      
       // Remove all mt-4 classes and replace with minimal spacing
       const mtContainers = document.querySelectorAll('.mt-4');
       mtContainers.forEach(el => {
@@ -454,6 +480,19 @@ function generateCustomCSS(config: PdfConfig): string {
       break-before: avoid !important;
       margin-top: 0 !important;
       padding-top: 0 !important;
+    }
+    
+    /* FINAL FIX: Force consecutive Cohen sections to stick */
+    .bg-custom-reporte-mensual:contains("Inversiones") ~ * .bg-custom-reporte-mensual:contains("Rendimiento") {
+      page-break-before: avoid !important;
+      break-before: avoid !important;
+    }
+    
+    /* Nuclear option: eliminate ALL space between major sections */
+    .container + .container {
+      page-break-before: avoid !important;
+      break-before: avoid !important;
+      margin-top: 0 !important;
     }
     
     /* Optimize page breaks for better content flow */
