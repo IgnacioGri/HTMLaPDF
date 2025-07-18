@@ -29,6 +29,10 @@ This is a full-stack web application designed to convert Cohen financial reports
 - **Dynamic Timeout System**: Intelligent timeout scaling based on file size (30s base + 100ms per KB, max 2 minutes)
 - **Variable Error Fixed**: Resolved `contentSizeKB` initialization error that was causing PDF generation failures
 - **System Resilience**: Large files (3600+ lines) now process successfully without infinite "Processing" states
+- **Job Timeout Management**: Implemented automatic timeout and cleanup for hanging jobs - prevents infinite processing states
+- **HTML Validation**: Added pre-processing validation to detect and sanitize problematic HTML content
+- **Automatic Cleanup**: System automatically cleans up hanging jobs on server restart, ensuring fresh state
+- **Resource Management**: Enhanced browser lifecycle management with proper cleanup and error handling
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.

@@ -4,6 +4,8 @@ import fs from 'fs/promises';
 import { storage } from '../storage.js';
 import type { PdfConfig } from '../../shared/schema.js';
 import { createRequire } from 'module';
+import { validateHtml, sanitizeHtml } from './html-validation.js';
+import { startJobTimeout, clearJobTimeout, completeJob } from './job-timeout-manager.js';
 const require = createRequire(import.meta.url);
 const htmlPdf = require('html-pdf-node');
 
@@ -16,11 +18,22 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     // Ensure output directory exists
     await fs.mkdir(PDF_OUTPUT_DIR, { recursive: true });
     
+    // Start job timeout monitoring
+    startJobTimeout(jobId);
+    
     // Update job status to processing
     await storage.updateConversionJobStatus(jobId, "processing");
     
     console.log('Environment:', process.env.NODE_ENV);
     console.log('HTML content size:', htmlContent.length, 'characters');
+    
+    // Validate HTML before processing
+    const validation = validateHtml(htmlContent);
+    if (!validation.isValid) {
+      console.log('HTML validation warnings:', validation.errors);
+      // Continue but sanitize the content
+      htmlContent = sanitizeHtml(htmlContent);
+    }
     
     // Set timeout based on content size - larger files need more time
     const contentSizeKB = htmlContent.length / 1024;
@@ -251,8 +264,11 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
       path: outputPath,
     });
     
+    // Clear timeout and mark job as completed
+    completeJob(jobId);
+    
     // Update job status to completed
-    await storage.updateConversionJobStatus(jobId, "completed");
+    await storage.updateConversionJobStatus(jobId, "completed", null, outputPath);
     
     return outputPath;
     
@@ -301,8 +317,11 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
       const pdfBuffer = await htmlPdf.generatePdf(file, options);
       await fs.writeFile(fallbackOutputPath, pdfBuffer);
       
+      // Clear timeout and mark job as completed
+      completeJob(jobId);
+      
       // Update job status to completed
-      await storage.updateConversionJobStatus(jobId, "completed");
+      await storage.updateConversionJobStatus(jobId, "completed", null, fallbackOutputPath);
       
       console.log('PDF generated successfully with html-pdf-node fallback');
       return fallbackOutputPath;
@@ -311,7 +330,8 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
       console.error('Fallback PDF generation also failed:', fallbackError);
       
       try {
-        await storage.updateConversionJobStatus(jobId, "failed");
+        clearJobTimeout(jobId);
+        await storage.updateConversionJobStatus(jobId, "failed", "PDF generation failed - both primary and fallback methods unsuccessful");
       } catch (statusError) {
         console.error('Failed to update job status:', statusError);
       }
