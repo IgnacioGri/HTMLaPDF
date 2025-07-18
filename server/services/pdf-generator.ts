@@ -224,7 +224,17 @@ function generateCustomCSS(config: PdfConfig): string {
       text-overflow: unset !important; /* Sin truncamiento */
       word-wrap: break-word !important; /* Romper palabras largas si es necesario */
       height: auto !important; /* Altura automática */
-      color: #000000 !important; /* Color negro forzado para el texto */
+    }
+    
+    /* Primera columna de tablas pequeñas con fondo marrón y texto blanco */
+    table.small-table td:first-child {
+      background-color: #8B7355 !important; /* Fondo marrón */
+      color: white !important; /* Texto blanco para buen contraste */
+    }
+    
+    /* Resto de celdas con texto negro */
+    table.small-table td:not(:first-child) {
+      color: #000000 !important; /* Texto negro para valores */
     }
     
     /* MEDIUM TABLES: 8-14 columns - medium font and auto layout */
