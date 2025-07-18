@@ -111,13 +111,24 @@ export default function PdfPreview({ jobId, file, analysis }: PdfPreviewProps) {
             <h3 className="text-lg font-semibold text-foreground mb-2">PDF Generado</h3>
             <p className="text-muted-foreground mb-6">Tu reporte está listo para descargar</p>
             
-            <Button 
-              onClick={() => window.open(`/api/download/${jobId}`, '_blank')}
-              className="w-full"
-            >
-              <Download className="mr-2 h-4 w-4" />
-              Descargar PDF
-            </Button>
+            <div className="space-y-3">
+              <Button 
+                onClick={() => window.open(`/api/download/${jobId}`, '_blank')}
+                className="w-full"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Descargar PDF
+              </Button>
+              
+              <Button 
+                onClick={() => window.location.reload()}
+                variant="outline"
+                className="w-full"
+              >
+                <FileText className="mr-2 h-4 w-4" />
+                Cargar Nuevo Archivo
+              </Button>
+            </div>
           </div>
         ) : job?.status === "failed" ? (
           <div className="text-center py-8">

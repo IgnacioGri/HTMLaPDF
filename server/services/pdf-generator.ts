@@ -331,13 +331,13 @@ function generateCustomCSS(config: PdfConfig): string {
       color: white !important;
     }
     
-    /* Section headers - BALANCED spacing */
+    /* Section headers - Smart pagination with proper spacing */
     h1, h2, h3, h4, h5, h6 {
       font-weight: bold !important;
       color: inherit !important;
-      margin: 10px 0 4px 0 !important; /* Moderate top margin, tight bottom */
+      margin: 8px 0 5px 0 !important; /* Balanced margins */
       page-break-after: avoid !important;
-      page-break-before: auto !important; /* Allow natural breaks but avoid orphans */
+      page-break-before: auto !important; 
     }
     
     /* Specific styling for common Cohen sections */
@@ -349,9 +349,9 @@ function generateCustomCSS(config: PdfConfig): string {
     *:contains("Detalle de actividad") {
       font-weight: bold !important;
       font-size: 12px !important;
-      margin: 8px 0 3px 0 !important; /* Breathing room above, tight below */
+      margin: 6px 0 4px 0 !important; 
       page-break-after: avoid !important;
-      page-break-before: auto !important; /* Natural breaks allowed */
+      page-break-before: auto !important;
     }
     
     /* Ensure table headers are always preserved and visible */
@@ -360,18 +360,11 @@ function generateCustomCSS(config: PdfConfig): string {
       break-inside: avoid !important;
     }
     
-    /* Keep titles with their content - smart orphan prevention */
+    /* Keep section title with at least first 3 rows of content */
     h1 + table, h2 + table, h3 + table, h4 + table, h5 + table, h6 + table,
     .section-title + table {
       page-break-before: avoid !important;
       break-before: avoid !important;
-      margin-top: 2px !important; /* Minimal but visible spacing */
-    }
-    
-    /* Prevent orphaned titles at bottom of page */
-    h1, h2, h3, h4, h5, h6 {
-      orphans: 3 !important; /* Need at least 3 lines of content after title */
-      page-break-inside: avoid !important;
     }
     
     /* Optimize page breaks for better content flow */
@@ -414,12 +407,11 @@ function generateCustomCSS(config: PdfConfig): string {
       }
     ` : ''}
     
-    /* AGGRESSIVE anti-blank-page rules */
+    /* Professional page break rules with smart table breaks */
     @media print {
-      /* Minimize page breaks */
+      /* Allow tables to break naturally but avoid bad breaks */
       table {
         page-break-inside: auto;
-        page-break-before: avoid !important; /* Tables stick to previous content */
       }
       
       tr {
@@ -427,21 +419,10 @@ function generateCustomCSS(config: PdfConfig): string {
         page-break-after: auto;
       }
       
-      /* Controlled spacing between sections */
-      div, p, section {
-        margin-bottom: 6px !important; /* Small but visible spacing */
-      }
-      
       /* Typography improvements */
       p {
         orphans: 2;
         widows: 2;
-        margin: 4px 0 !important; /* Readable paragraph spacing */
-      }
-      
-      /* Space between major sections */
-      table + h1, table + h2, table + h3 {
-        margin-top: 15px !important; /* Breathing room between sections */
       }
       
       /* Better section spacing */
