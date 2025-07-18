@@ -68,14 +68,17 @@
 /* Cohen custom utilities */
 .cohen-burgundy {
   background-color: var(--cohen-burgundy);
+  color: white;
 }
 
 .cohen-burgundy-dark {
   background-color: var(--cohen-burgundy-dark);
+  color: white;
 }
 
 .cohen-burgundy-light {
   background-color: var(--cohen-burgundy-light);
+  color: white;
 }
 
 .cohen-gray {

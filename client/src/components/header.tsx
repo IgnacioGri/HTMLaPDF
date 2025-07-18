@@ -11,7 +11,7 @@ export default function Header() {
             </div>
             <div>
               <h1 className="text-white text-xl font-semibold">Cohen PDF Generator</h1>
-              <p className="text-cohen-burgundy-light text-sm">Reportes Financieros Profesionales</p>
+              <p className="text-white/80 text-sm">Reportes Financieros Profesionales</p>
             </div>
           </div>
           <nav className="hidden md:flex space-x-6">
@@ -19,11 +19,11 @@ export default function Header() {
               <BarChart3 className="mr-2 h-4 w-4" />
               Convertir
             </a>
-            <a href="#" className="text-cohen-burgundy-light hover:text-white transition-colors flex items-center">
+            <a href="#" className="text-white/80 hover:text-white transition-colors flex items-center">
               <Settings className="mr-2 h-4 w-4" />
               Configuración
             </a>
-            <a href="#" className="text-cohen-burgundy-light hover:text-white transition-colors flex items-center">
+            <a href="#" className="text-white/80 hover:text-white transition-colors flex items-center">
               <Clock className="mr-2 h-4 w-4" />
               Historial
             </a>

@@ -68,7 +68,7 @@ export default function FileUpload({ onFileUploaded, analysis }: FileUploadProps
           <FileCode className="mr-3 h-5 w-5" />
           Cargar Reporte HTML
         </h2>
-        <p className="text-cohen-burgundy-light text-sm mt-1">
+        <p className="text-white/80 text-sm mt-1">
           Arrastra tu archivo HTML o haz clic para seleccionar
         </p>
       </div>
