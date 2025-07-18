@@ -147,7 +147,6 @@ function generateCustomCSS(config: PdfConfig): string {
       margin: 0 !important;
       padding: 0 !important;
       width: 100% !important;
-      color: #000 !important;
     }
     
     .container {
@@ -184,8 +183,6 @@ function generateCustomCSS(config: PdfConfig): string {
     
     table thead {
       display: table-header-group !important;
-      background-color: #112964 !important;
-      color: white !important;
       font-weight: bold !important;
     }
     
@@ -194,16 +191,12 @@ function generateCustomCSS(config: PdfConfig): string {
     }
     
     .bg-custom-reporte-mensual {
-      background-color: #112964 !important;
-      color: white !important;
       padding: 8px !important;
       margin: 2px 0 !important;
     }
     
-    /* Ensure totals are readable with black text on white background */
+    /* Ensure totals are readable */
     tfoot tr, .total-row {
-      background-color: white !important;
-      color: black !important;
       font-weight: bold !important;
     }
     
