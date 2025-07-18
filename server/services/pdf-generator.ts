@@ -637,25 +637,29 @@ function generateCustomCSS(config: PdfConfig): string {
       display: none !important;
     }
     
-    /* SURGICAL: Prevent total rows from breaking incorrectly */
-    .total-row-no-repeat {
+    /* Keep totals with their content - prevent orphaning */
+    .keep-with-content,
+    .converted-footer {
       page-break-before: avoid !important;
       break-before: avoid !important;
-      page-break-after: avoid !important;
-      break-after: avoid !important;
       page-break-inside: avoid !important;
       break-inside: avoid !important;
-    }
-    
-    /* Keep total rows with their context */
-    tr:has(.total-row-no-repeat),
-    tr[class*="total"],
-    tr:contains("TOTAL"),
-    tr:contains("Total") {
-      page-break-before: avoid !important;
-      break-before: avoid !important;
       orphans: 0 !important;
       widows: 0 !important;
+    }
+    
+    /* Style converted footers to match original */
+    .converted-footer {
+      background-color: #112964 !important;
+      color: white !important;
+      font-weight: bold !important;
+    }
+    
+    /* Prevent sections from breaking before totals */
+    tr:has(.keep-with-content) ~ tr,
+    tr + .keep-with-content {
+      page-break-after: avoid !important;
+      break-after: avoid !important;
     }
     
     /* Force table headers to repeat on page breaks */
