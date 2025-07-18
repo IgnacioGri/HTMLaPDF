@@ -65,10 +65,10 @@ export default function PdfPreview({ jobId, file, analysis }: PdfPreviewProps) {
   };
 
   return (
-    <Card>
-      <div className="cohen-burgundy px-6 py-4">
-        <h2 className="text-white text-lg font-semibold flex items-center">
-          <Eye className="mr-3 h-5 w-5" />
+    <Card className="bg-cohen-card-bg border-cohen-border shadow-sm">
+      <div className="bg-white px-6 py-4 border-b border-cohen-border">
+        <h2 className="text-cohen-text text-lg font-semibold flex items-center">
+          <Eye className="mr-3 h-5 w-5 text-cohen-burgundy" />
           Vista Previa
         </h2>
       </div>

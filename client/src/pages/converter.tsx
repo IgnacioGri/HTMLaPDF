@@ -79,7 +79,7 @@ export default function ConverterPage() {
             )}
 
             {/* Quick Stats */}
-            <Card>
+            <Card className="bg-cohen-card-bg border-cohen-border shadow-sm">
               <CardContent className="p-6">
                 <h3 className="font-medium text-cohen-text mb-4 flex items-center">
                   <Clock className="text-cohen-burgundy mr-2 h-4 w-4" />
@@ -87,7 +87,7 @@ export default function ConverterPage() {
                 </h3>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Reportes procesados hoy</span>
+                    <span className="text-sm text-cohen-secondary-text">Reportes procesados hoy</span>
                     <span className="font-semibold text-cohen-text">
                       {recentJobs.filter(job => {
                         const today = new Date().toDateString();
@@ -96,19 +96,19 @@ export default function ConverterPage() {
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Tiempo promedio</span>
+                    <span className="text-sm text-cohen-secondary-text">Tiempo promedio</span>
                     <span className="font-semibold text-cohen-text">8.3s</span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-muted-foreground">Éxito de conversión</span>
-                    <span className="font-semibold text-green-600">99.2%</span>
+                    <span className="text-sm text-cohen-secondary-text">Éxito de conversión</span>
+                    <span className="font-semibold text-cohen-burgundy">99.2%</span>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Recent Files */}
-            <Card>
+            <Card className="bg-cohen-card-bg border-cohen-border shadow-sm">
               <CardContent className="p-6">
                 <h3 className="font-medium text-cohen-text mb-4 flex items-center">
                   <Clock className="text-cohen-burgundy mr-2 h-4 w-4" />
@@ -153,10 +153,10 @@ export default function ConverterPage() {
         </div>
 
         {/* Help Section */}
-        <Card className="mt-12">
-          <div className="cohen-burgundy px-6 py-4">
-            <h2 className="text-white text-lg font-semibold flex items-center">
-              <FileText className="mr-3 h-5 w-5" />
+        <Card className="mt-12 bg-cohen-card-bg border-cohen-border shadow-sm">
+          <div className="bg-white px-6 py-4 border-b border-cohen-border">
+            <h2 className="text-cohen-text text-lg font-semibold flex items-center">
+              <FileText className="mr-3 h-5 w-5 text-cohen-burgundy" />
               Guía de Uso
             </h2>
           </div>

@@ -54,17 +54,18 @@ export default function ConfigSimple({
   }
 
   return (
-    <Card>
-      <div className="cohen-burgundy px-6 py-4">
-        <h2 className="text-white text-lg font-semibold">
+    <Card className="bg-cohen-card-bg border-cohen-border shadow-sm">
+      <div className="bg-white px-6 py-4 border-b border-cohen-border">
+        <h2 className="text-cohen-text text-lg font-semibold flex items-center">
+          <Download className="mr-3 h-5 w-5 text-cohen-burgundy" />
           Generar PDF
         </h2>
       </div>
       
       <CardContent className="p-6">
         <div className="space-y-4">
-          <div className="text-sm text-muted-foreground">
-            <p className="mb-2">Configuración optimizada para reportes Cohen:</p>
+          <div className="text-sm text-cohen-secondary-text">
+            <p className="mb-2 text-cohen-text font-medium">Configuración optimizada para reportes Cohen:</p>
             <ul className="space-y-1 text-xs">
               <li>• Página A4 vertical con márgenes optimizados</li>
               <li>• Encabezados de tabla repetidos en cada página</li>
@@ -76,7 +77,7 @@ export default function ConfigSimple({
           <Button 
             onClick={handleConvert}
             disabled={disabled || isConverting}
-            className="w-full cohen-burgundy hover:bg-burgundy-dark"
+            className="w-full btn-cohen-primary"
             size="lg"
           >
             {isConverting ? (

@@ -24,13 +24,15 @@
   --ring: hsl(325, 28%, 42%);
   --radius: 0.75rem;
   
-  /* Cohen-specific colors */
-  --cohen-burgundy: hsl(325, 28%, 42%);
-  --cohen-burgundy-dark: hsl(325, 35%, 32%);
-  --cohen-burgundy-light: hsl(325, 25%, 52%);
-  --cohen-gray: hsl(210, 17%, 98%);
-  --cohen-text: hsl(210, 15%, 20%);
-  --cohen-border: hsl(210, 20%, 90%);
+  /* Cohen-specific colors - replicating real app */
+  --cohen-burgundy: hsl(355, 67%, 45%);
+  --cohen-burgundy-dark: hsl(355, 67%, 35%);
+  --cohen-burgundy-light: hsl(355, 67%, 55%);
+  --cohen-gray: hsl(220, 13%, 96%);
+  --cohen-text: hsl(217, 19%, 27%);
+  --cohen-border: hsl(220, 13%, 91%);
+  --cohen-card-bg: hsl(0, 0%, 100%);
+  --cohen-secondary-text: hsl(217, 10%, 47%);
 }
 
 .dark {
@@ -65,20 +67,17 @@
   }
 }
 
-/* Cohen custom utilities */
+/* Cohen custom utilities - replicating real app styles */
 .cohen-burgundy {
   background-color: var(--cohen-burgundy);
-  color: white;
 }
 
 .cohen-burgundy-dark {
   background-color: var(--cohen-burgundy-dark);
-  color: white;
 }
 
 .cohen-burgundy-light {
   background-color: var(--cohen-burgundy-light);
-  color: white;
 }
 
 .cohen-gray {
@@ -93,12 +92,51 @@
   color: var(--cohen-text);
 }
 
+.text-cohen-secondary-text {
+  color: var(--cohen-secondary-text);
+}
+
+.bg-cohen-card-bg {
+  background-color: var(--cohen-card-bg);
+}
+
 .border-cohen-border {
   border-color: var(--cohen-border);
 }
 
 .border-cohen-burgundy {
   border-color: var(--cohen-burgundy);
+}
+
+/* Cohen-style buttons matching real app */
+.btn-cohen-primary {
+  background-color: var(--cohen-burgundy);
+  color: white;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 12px 24px;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-cohen-primary:hover {
+  background-color: var(--cohen-burgundy-dark);
+  color: white;
+}
+
+.btn-cohen-secondary {
+  background-color: transparent;
+  color: var(--cohen-text);
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 12px 24px;
+  border: 1px solid var(--cohen-border);
+  transition: all 0.2s ease;
+}
+
+.btn-cohen-secondary:hover {
+  background-color: var(--cohen-gray);
+  color: var(--cohen-text);
 }
 
 /* Animation for file upload */

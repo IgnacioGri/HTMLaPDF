@@ -62,13 +62,13 @@ export default function FileUpload({ onFileUploaded, analysis }: FileUploadProps
   };
 
   return (
-    <Card>
-      <div className="cohen-burgundy px-6 py-4">
-        <h2 className="text-white text-lg font-semibold flex items-center">
-          <FileCode className="mr-3 h-5 w-5" />
+    <Card className="bg-cohen-card-bg border-cohen-border shadow-sm">
+      <div className="bg-white px-6 py-4 border-b border-cohen-border">
+        <h2 className="text-cohen-text text-lg font-semibold flex items-center">
+          <FileCode className="mr-3 h-5 w-5 text-cohen-burgundy" />
           Cargar Reporte HTML
         </h2>
-        <p className="text-white/80 text-sm mt-1">
+        <p className="text-cohen-secondary-text text-sm mt-1">
           Arrastra tu archivo HTML o haz clic para seleccionar
         </p>
       </div>
@@ -77,22 +77,22 @@ export default function FileUpload({ onFileUploaded, analysis }: FileUploadProps
         {!uploadedFile ? (
           <div
             {...getRootProps()}
-            className={`border-3 border-dashed border-muted rounded-xl p-12 text-center hover:border-primary hover:bg-muted/50 transition-all duration-300 cursor-pointer group ${
-              isDragActive ? 'border-primary bg-muted/50' : ''
+            className={`border-2 border-dashed border-cohen-border rounded-lg p-12 text-center hover:border-cohen-burgundy hover:bg-cohen-gray/50 transition-all duration-300 cursor-pointer group ${
+              isDragActive ? 'border-cohen-burgundy bg-cohen-gray/50' : ''
             }`}
           >
             <input {...getInputProps()} />
             <div className="space-y-4">
-              <div className="mx-auto w-16 h-16 bg-primary rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+              <div className="mx-auto w-16 h-16 bg-cohen-burgundy rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform">
                 <FileCode className="text-white h-8 w-8" />
               </div>
               <div>
-                <h3 className="text-lg font-medium text-foreground">
+                <h3 className="text-lg font-medium text-cohen-text">
                   {isDragActive ? 'Suelta el archivo aquí' : 'Selecciona tu reporte HTML'}
                 </h3>
-                <p className="text-muted-foreground mt-1">Formatos soportados: .html, .htm</p>
+                <p className="text-cohen-secondary-text mt-1">Formatos soportados: .html, .htm</p>
               </div>
-              <Button className="inline-flex items-center">
+              <Button className="btn-cohen-primary inline-flex items-center">
                 <FolderOpen className="mr-2 h-4 w-4" />
                 Examinar archivos
               </Button>

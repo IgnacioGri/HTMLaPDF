@@ -25,6 +25,7 @@ This is a full-stack web application designed to convert Cohen financial reports
 ## User Preferences
 Preferred communication style: Simple, everyday language.
 PDF styling preference: Maintain exact visual appearance of original HTML with improved pagination and column visibility.
+UI Design preference: Replicate Cohen's real app design - clean white cards on light gray background, burgundy accents, professional typography, minimal shadows.
 
 ## System Architecture
 
