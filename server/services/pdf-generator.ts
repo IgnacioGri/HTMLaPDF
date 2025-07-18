@@ -223,6 +223,7 @@ function generateCustomCSS(config: PdfConfig): string {
       text-overflow: unset !important; /* Sin truncamiento */
       word-wrap: break-word !important; /* Romper palabras largas si es necesario */
       height: auto !important; /* Altura automática */
+      color: #000000 !important; /* Color negro forzado para el texto */
     }
     
     /* MEDIUM TABLES: 8-14 columns - medium font and auto layout */
@@ -243,6 +244,7 @@ function generateCustomCSS(config: PdfConfig): string {
       line-height: 1.0 !important;
       white-space: normal !important; /* Permitir wrap en tablas medianas también */
       overflow: visible !important;
+      color: #000000 !important; /* Color negro forzado para el texto */
     }
     
     /* LARGE TABLES: 15+ columns - keep small font */
@@ -266,6 +268,7 @@ function generateCustomCSS(config: PdfConfig): string {
       white-space: nowrap !important; /* Mantener nowrap en tablas grandes */
       overflow: hidden !important;
       text-overflow: ellipsis !important;
+      color: #000000 !important; /* Color negro forzado para el texto */
     }
     
     /* COLUMN DISTRIBUTION - Auto width for small/medium, fixed for large */
