@@ -33,8 +33,14 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     `;
     
     console.log('Launching Puppeteer browser...');
+    
+    // Use installed Chrome path for deployment
+    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || 
+                          '/home/runner/.cache/puppeteer/chrome/linux-138.0.7204.157/chrome-linux64/chrome';
+    
     browser = await puppeteer.launch({
       headless: true,
+      executablePath,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -53,8 +59,7 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
         '--disable-web-security',
         '--disable-features=VizDisplayCompositor',
         '--window-size=1920,1080'
-      ],
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined
+      ]
     });
     console.log('Browser launched successfully');
     
