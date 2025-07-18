@@ -186,8 +186,7 @@ function generateCustomCSS(config: PdfConfig): string {
       border: 0.5px solid #666 !important;
       font-size: 7px !important;
       line-height: 1.0 !important;
-      white-space: nowrap !important;
-      overflow: hidden !important;
+      /* Removed white-space and overflow restrictions - will be controlled per table type */
     }
     
     table td {
@@ -196,9 +195,7 @@ function generateCustomCSS(config: PdfConfig): string {
       vertical-align: top !important;
       font-size: 6px !important;
       line-height: 1.0 !important;
-      white-space: nowrap !important;
-      overflow: hidden !important;
-      text-overflow: ellipsis !important;
+      /* Removed white-space and overflow restrictions - will be controlled per table type */
     }
     
     /* SMALL TABLES: Less than 8 columns - bigger font and auto layout */
@@ -209,19 +206,23 @@ function generateCustomCSS(config: PdfConfig): string {
     
     table.small-table th {
       font-size: 11px !important;
-      padding: 4px 3px !important;
-      line-height: 1.2 !important;
-      white-space: normal !important; /* Permitir wrap del texto en headers */
+      padding: 4px 6px !important; /* Más padding horizontal */
+      line-height: 1.3 !important;
+      white-space: normal !important; /* Permitir wrap completo */
       overflow: visible !important;
+      text-overflow: unset !important; /* Sin truncamiento */
+      word-wrap: break-word !important; /* Romper palabras largas si es necesario */
     }
     
     table.small-table td {
       font-size: 10px !important;
-      padding: 3px 2px !important;
-      line-height: 1.1 !important;
-      white-space: normal !important; /* Permitir wrap del texto */
+      padding: 4px 6px !important; /* Más padding horizontal */
+      line-height: 1.2 !important;
+      white-space: normal !important; /* Permitir wrap completo */
       overflow: visible !important; /* Mostrar todo el texto */
-      text-overflow: clip !important; /* No cortar texto */
+      text-overflow: unset !important; /* Sin truncamiento */
+      word-wrap: break-word !important; /* Romper palabras largas si es necesario */
+      height: auto !important; /* Altura automática */
     }
     
     /* MEDIUM TABLES: 8-14 columns - medium font and auto layout */
@@ -253,12 +254,18 @@ function generateCustomCSS(config: PdfConfig): string {
       font-size: 7px !important;
       padding: 2px 1px !important;
       line-height: 1.0 !important;
+      white-space: nowrap !important; /* Mantener nowrap en tablas grandes */
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
     
     table.large-table td {
       font-size: 6px !important;
       padding: 1px 0.5px !important;
       line-height: 1.0 !important;
+      white-space: nowrap !important; /* Mantener nowrap en tablas grandes */
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
     
     /* COLUMN DISTRIBUTION - Auto width for small/medium, fixed for large */
