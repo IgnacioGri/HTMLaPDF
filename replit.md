@@ -14,13 +14,15 @@ This is a full-stack web application designed to convert Cohen financial reports
 ## Recent Changes (January 18, 2025)
 - **FIXED Runtime Error**: Resolved circular dependency in pdf-preview.tsx useQuery causing "Cannot access uninitialized variable"
 - **Enhanced PDF Generation**: Complete overhaul of CSS styling system for optimal Cohen report formatting
-- **Improved Table Handling**: Advanced column width optimization, table-layout fixed, font-size reduction for wide tables
-- **Better Page Breaks**: Intelligent pagination with avoid-break classes for investment groups and sections
-- **Margin Optimization**: Equal margins on all sides, optimized for A4 format with maximum content visibility
+- **Preserved Original Styling**: Modified CSS to maintain exact HTML appearance with improved pagination and column visibility
+- **Optimized Column Distribution**: Smart width allocation ensuring all columns visible without truncation
+- **Improved Page Breaks**: Intelligent pagination with avoid-break classes for investment groups and sections
+- **Better Margins**: Professional spacing optimized for A4 format while preserving original design
 - **System Dependencies**: All Puppeteer dependencies installed (alsa-lib, systemd, udev, libxkbcommon)
 
 ## User Preferences
 Preferred communication style: Simple, everyday language.
+PDF styling preference: Maintain exact visual appearance of original HTML with improved pagination and column visibility.
 
 ## System Architecture
 

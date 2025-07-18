@@ -114,240 +114,110 @@ export async function generatePdf(
 
 function generateCustomCSS(config: PdfConfig): string {
   return `
-    /* Reset and base styles for optimal PDF generation */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    /* Preserve original HTML appearance with minimal PDF optimizations */
     
     @page {
       size: A4;
       margin: ${config.marginTop}mm ${config.marginSide}mm ${config.marginTop}mm ${config.marginSide}mm;
     }
     
+    /* Keep original fonts and styling, just optimize for print */
     body {
-      font-family: Arial, sans-serif;
-      font-size: 9px;
-      line-height: 1.2;
-      color: #000;
+      margin: 0;
+      padding: 10px;
       background: white;
-      transform: scale(${config.contentScale / 100});
-      transform-origin: top left;
-      width: ${100 / (config.contentScale / 100)}%;
+      ${config.contentScale !== 100 ? `
+        transform: scale(${config.contentScale / 100});
+        transform-origin: top left;
+        width: ${100 / (config.contentScale / 100)}%;
+      ` : ''}
     }
     
-    /* Optimized table styles for all columns visible */
+    /* Ensure tables are properly sized for all columns */
     table {
       width: 100% !important;
       border-collapse: collapse !important;
-      table-layout: fixed !important;
-      margin-bottom: 10px;
-      font-size: 8px !important;
+      table-layout: auto !important;
+      margin-bottom: 15px;
     }
     
-    /* Make tables fit by adjusting column widths automatically */
+    /* Preserve original cell styling with minor adjustments for visibility */
     table td, table th {
-      padding: 2px 1px !important;
-      border: 0.5px solid #ccc !important;
-      vertical-align: top !important;
       word-wrap: break-word !important;
       overflow-wrap: break-word !important;
       hyphens: auto !important;
-      font-size: 7px !important;
-      line-height: 1.1 !important;
+      vertical-align: top !important;
     }
     
-    /* Header styles */
-    table th {
-      background-color: #8B0000 !important;
-      color: white !important;
-      font-weight: bold !important;
-      text-align: center !important;
+    /* Ensure text is readable in print */
+    table td {
       font-size: 8px !important;
+      padding: 3px 2px !important;
+      line-height: 1.2 !important;
     }
     
-    /* Specific column width optimizations for Cohen tables */
-    table.main-table td:first-child,
-    table.main-table th:first-child {
-      width: 8% !important;
+    table th {
+      font-size: 8px !important;
+      padding: 4px 3px !important;
+      line-height: 1.2 !important;
     }
     
-    table.main-table td:nth-child(2),
-    table.main-table th:nth-child(2) {
-      width: 15% !important;
-    }
+    /* Optimize column distribution for wide tables */
+    table.main-table td:nth-child(1) { width: 8%; }
+    table.main-table td:nth-child(2) { width: 12%; }
+    table.main-table td:nth-child(3) { width: 10%; }
+    table.main-table td:nth-child(4) { width: 10%; }
+    table.main-table td:nth-child(5) { width: 10%; }
+    table.main-table td:nth-child(6) { width: 10%; }
+    table.main-table td:nth-child(7) { width: 10%; }
+    table.main-table td:nth-child(8) { width: 10%; }
+    table.main-table td:nth-child(9) { width: 10%; }
+    table.main-table td:nth-child(n+10) { width: auto; min-width: 6%; }
     
-    table.main-table td:nth-child(3),
-    table.main-table th:nth-child(3) {
-      width: 12% !important;
-    }
-    
-    table.main-table td:nth-child(4),
-    table.main-table th:nth-child(4) {
-      width: 12% !important;
-    }
-    
-    table.main-table td:nth-child(5),
-    table.main-table th:nth-child(5) {
-      width: 10% !important;
-    }
-    
-    table.main-table td:nth-child(6),
-    table.main-table th:nth-child(6) {
-      width: 12% !important;
-    }
-    
-    table.main-table td:nth-child(7),
-    table.main-table th:nth-child(7) {
-      width: 10% !important;
-    }
-    
-    table.main-table td:nth-child(8),
-    table.main-table th:nth-child(8) {
-      width: 12% !important;
-    }
-    
-    /* Remaining columns share the rest */
-    table.main-table td:nth-child(n+9),
-    table.main-table th:nth-child(n+9) {
-      width: auto !important;
-      min-width: 8% !important;
-    }
-    
-    /* Numbers and currency formatting */
-    .number, .currency {
-      text-align: right !important;
-      font-family: 'Courier New', monospace !important;
-    }
-    
+    /* Smart page breaks - preserve original content flow */
     ${config.repeatHeaders ? `
       @media print {
         thead {
           display: table-header-group !important;
         }
-        
-        table thead tr {
-          page-break-inside: avoid !important;
-          break-inside: avoid !important;
-        }
-        
-        .cohen-header {
-          position: -webkit-sticky;
-          position: sticky;
-          top: 0;
-          z-index: 10;
-        }
       }
     ` : ''}
     
     ${config.keepGroupsTogether ? `
-      .asset-group,
       .investment-group,
-      .table-section,
+      .section-header,
       .lote-section {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
       }
       
-      /* Keep related rows together */
+      /* Keep detail rows with main rows */
       tr.main-row + tr.detail-row {
         page-break-before: avoid !important;
         break-before: avoid !important;
       }
     ` : ''}
     
-    /* Page break optimizations */
+    /* Basic page break optimization */
     @media print {
-      .page-break-before {
-        page-break-before: always !important;
-        break-before: page !important;
+      h1, h2, h3, h4, h5, h6 {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
       }
       
-      .page-break-after {
-        page-break-after: always !important;
-        break-after: page !important;
+      table {
+        page-break-inside: auto;
+      }
+      
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
       }
       
       .avoid-break {
         page-break-inside: avoid !important;
         break-inside: avoid !important;
       }
-      
-      /* Avoid orphaned headers */
-      h1, h2, h3, h4, h5, h6 {
-        page-break-after: avoid !important;
-        break-after: avoid !important;
-      }
-      
-      /* Keep minimum lines together */
-      p {
-        orphans: 3;
-        widows: 3;
-      }
-    }
-    
-    /* Cohen branding styles */
-    .cohen-header {
-      background-color: #8B0000 !important;
-      color: white !important;
-      padding: 5px !important;
-      text-align: center !important;
-      font-weight: bold !important;
-      font-size: 12px !important;
-    }
-    
-    .cohen-subtitle {
-      font-size: 10px !important;
-      font-weight: bold !important;
-      margin: 5px 0 !important;
-    }
-    
-    /* Specific styles for account summary section */
-    .account-summary {
-      border: 1px solid #8B0000 !important;
-      margin: 10px 0 !important;
-    }
-    
-    .account-summary table {
-      margin: 0 !important;
-    }
-    
-    .account-summary th {
-      background-color: #8B0000 !important;
-      color: white !important;
-    }
-    
-    /* Investment details styling */
-    .investment-details td {
-      font-size: 7px !important;
-    }
-    
-    .investment-total {
-      font-weight: bold !important;
-      background-color: #f5f5f5 !important;
-    }
-    
-    /* Ensure all text is visible and properly sized */
-    .small-text {
-      font-size: 6px !important;
-      line-height: 1.0 !important;
-    }
-    
-    /* Fix for very wide tables - horizontal scrolling prevention */
-    .table-container {
-      width: 100% !important;
-      overflow: visible !important;
-    }
-    
-    /* Make sure numbers don't wrap */
-    .nowrap {
-      white-space: nowrap !important;
-    }
-    
-    /* Currency symbols and formatting */
-    .currency-symbol {
-      font-weight: bold !important;
     }
   `;
 }

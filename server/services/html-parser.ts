@@ -116,12 +116,14 @@ export function analyzeHtml(htmlContent: string): AnalysisResult {
 export function injectCohenStyles(htmlContent: string): string {
   const $ = cheerio.load(htmlContent);
   
-  // Identify and add classes to tables for better CSS targeting
+  // Minimal modifications to preserve original HTML appearance
+  
+  // Just add classes for table optimization without changing visual style
   $('table').each((i, table) => {
     const $table = $(table);
     const colCount = $table.find('tr').first().find('td, th').length;
     
-    // Add classes based on table characteristics
+    // Add classes for CSS targeting only
     if (colCount >= 6) {
       $table.addClass('main-table wide-table');
     } else if (colCount >= 3) {
@@ -130,7 +132,7 @@ export function injectCohenStyles(htmlContent: string): string {
       $table.addClass('summary-table');
     }
     
-    // Mark investment detail rows
+    // Mark investment detail rows for page break optimization
     $table.find('tr').each((j, row) => {
       const rowText = $(row).text().toLowerCase();
       if (rowText.includes('lote') && rowText.includes('/')) {
@@ -141,7 +143,7 @@ export function injectCohenStyles(htmlContent: string): string {
     });
   });
   
-  // Add section classes for better page breaks
+  // Add section classes only for page break management
   $('*').each((i, el) => {
     const text = $(el).text().toLowerCase();
     if (text.includes('tenencias al') || text.includes('resumen de') || text.includes('movimientos entre')) {
