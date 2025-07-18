@@ -3,6 +3,8 @@ import path from 'path';
 import fs from 'fs/promises';
 import { storage } from '../storage.js';
 import type { PdfConfig } from '../../shared/schema.js';
+import { generatePdfWithFallback } from './html-to-pdf-fallback.js';
+import { generatePdfWithFallback } from './html-to-pdf-fallback.js';
 
 const PDF_OUTPUT_DIR = './generated-pdfs';
 
@@ -229,18 +231,35 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     return outputPath;
     
   } catch (error) {
-    console.error('PDF generation error:', error);
-    console.error('Error stack:', error.stack);
+    console.error('Puppeteer PDF generation failed:', error);
+    console.error('Attempting fallback method...');
     
     try {
-      await storage.updateConversionJobStatus(jobId, "failed");
-    } catch (statusError) {
-      console.error('Failed to update job status:', statusError);
+      // Try fallback method with html-pdf-node
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const filename = `cohen-report-${jobId}-${timestamp}.pdf`;
+      const fallbackOutputPath = path.join(PDF_OUTPUT_DIR, filename);
+      
+      await generatePdfWithFallback(htmlContent, config, fallbackOutputPath);
+      
+      // Update job status to completed
+      await storage.updateConversionJobStatus(jobId, "completed");
+      
+      console.log('PDF generated successfully with fallback method');
+      return fallbackOutputPath;
+      
+    } catch (fallbackError) {
+      console.error('Fallback PDF generation also failed:', fallbackError);
+      
+      try {
+        await storage.updateConversionJobStatus(jobId, "failed");
+      } catch (statusError) {
+        console.error('Failed to update job status:', statusError);
+      }
+      
+      const errorMessage = `PDF generation temporarily unavailable. Both primary and fallback methods failed.\n\nSystem error: ${error.message}\n\nFallback error: ${fallbackError.message}`;
+      throw new Error(errorMessage);
     }
-    
-    const errorMessage = `PDF generation temporarily unavailable due to system configuration issues.\n\nThe HTML analysis was successful and detected a valid Cohen report format with 20 tables and 68 financial assets.\n\nSystem error: ${error.message}\n\nThis is likely due to missing system dependencies for the browser engine in the current environment.`;
-    
-    throw new Error(errorMessage);
   } finally {
     try {
       if (browser) {
