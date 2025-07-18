@@ -61,6 +61,29 @@ export async function generatePdf(
       timeout: 30000
     });
     
+    // Add smart table classes based on column count
+    await page.evaluate(() => {
+      const tables = document.querySelectorAll('table');
+      tables.forEach(table => {
+        const headerRow = table.querySelector('tr');
+        if (headerRow) {
+          const columnCount = headerRow.children.length;
+          
+          // Add size class based on column count
+          if (columnCount <= 7) {
+            table.classList.add('small-table');
+          } else if (columnCount <= 14) {
+            table.classList.add('medium-table');
+          } else {
+            table.classList.add('large-table');
+          }
+          
+          // Add exact column count for precise styling
+          table.setAttribute('data-columns', columnCount.toString());
+        }
+      });
+    });
+    
     // Add custom CSS for better table handling
     await page.addStyleTag({
       content: generateCustomCSS(config)
@@ -179,55 +202,72 @@ function generateCustomCSS(config: PdfConfig): string {
     }
     
     /* SMALL TABLES: Less than 8 columns - bigger font */
-    table:has(tr th:nth-child(-n+7):last-child) {
+    table.small-table {
       font-size: 11px !important;
     }
     
-    table:has(tr th:nth-child(-n+7):last-child) th {
+    table.small-table th {
       font-size: 11px !important;
       padding: 4px 3px !important;
       line-height: 1.2 !important;
     }
     
-    table:has(tr th:nth-child(-n+7):last-child) td {
+    table.small-table td {
       font-size: 10px !important;
       padding: 3px 2px !important;
       line-height: 1.1 !important;
     }
     
     /* MEDIUM TABLES: 8-14 columns - medium font */
-    table:has(tr th:nth-child(8)) table:not(:has(tr th:nth-child(15))) {
+    table.medium-table {
       font-size: 9px !important;
     }
     
-    table:has(tr th:nth-child(8)) table:not(:has(tr th:nth-child(15))) th {
+    table.medium-table th {
       font-size: 9px !important;
       padding: 3px 2px !important;
       line-height: 1.1 !important;
     }
     
-    table:has(tr th:nth-child(8)) table:not(:has(tr th:nth-child(15))) td {
+    table.medium-table td {
       font-size: 8px !important;
       padding: 2px 1px !important;
       line-height: 1.0 !important;
     }
     
+    /* LARGE TABLES: 15+ columns - keep small font */
+    table.large-table {
+      font-size: 7px !important;
+    }
+    
+    table.large-table th {
+      font-size: 7px !important;
+      padding: 2px 1px !important;
+      line-height: 1.0 !important;
+    }
+    
+    table.large-table td {
+      font-size: 6px !important;
+      padding: 1px 0.5px !important;
+      line-height: 1.0 !important;
+    }
+    
     /* COLUMN DISTRIBUTION - Dynamic based on column count */
     /* Small tables: wider columns */
-    table:has(tr th:nth-child(-n+7):last-child) th,
-    table:has(tr th:nth-child(-n+7):last-child) td {
+    table.small-table th,
+    table.small-table td {
       width: calc(100% / 7) !important;
     }
     
     /* Medium tables: medium columns */
-    table:has(tr th:nth-child(8)) table:not(:has(tr th:nth-child(15))) th,
-    table:has(tr th:nth-child(8)) table:not(:has(tr th:nth-child(15))) td {
+    table.medium-table th,
+    table.medium-table td {
       width: calc(100% / 12) !important;
     }
     
     /* Large tables: small columns */
-    table:has(tr th:nth-child(15)) th,
-    table:has(tr th:nth-child(15)) td {
+    table.large-table th,
+    table.large-table td {
       width: calc(100% / 20) !important;
     }
     
