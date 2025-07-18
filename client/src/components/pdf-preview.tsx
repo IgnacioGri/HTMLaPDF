@@ -10,10 +10,9 @@ interface PdfPreviewProps {
   jobId: number | null;
   file: File | null;
   analysis: AnalysisResult | null;
-  config: PdfConfig;
 }
 
-export default function PdfPreview({ jobId, file, analysis, config }: PdfPreviewProps) {
+export default function PdfPreview({ jobId, file, analysis }: PdfPreviewProps) {
   const [progress, setProgress] = useState(0);
 
   const { data: job, refetchInterval } = useQuery({

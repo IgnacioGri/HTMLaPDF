@@ -1,29 +1,18 @@
 import { useState } from "react";
 import Header from "@/components/header";
 import FileUpload from "@/components/file-upload";
-import ConfigurationPanel from "@/components/configuration-panel";
+import SimpleConfigPanel from "@/components/simple-config-panel";
 import PdfPreview from "@/components/pdf-preview";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
 import { getRecentJobs } from "@/lib/api";
 import { FileText, Download, Clock } from "lucide-react";
-import type { PdfConfig, AnalysisResult } from "@shared/schema";
+import type { AnalysisResult } from "@shared/schema";
 
 export default function ConverterPage() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [config, setConfig] = useState<PdfConfig>({
-    pageSize: "A4",
-    orientation: "portrait",
-    marginTop: 5,
-    marginSide: 5,
-    repeatHeaders: true,
-    keepGroupsTogether: true,
-    alternateRowColors: true,
-    autoFitText: false,
-    contentScale: 85,
-  });
   const [jobId, setJobId] = useState<number | null>(null);
 
   const { data: recentJobs = [] } = useQuery({
@@ -65,9 +54,7 @@ export default function ConverterPage() {
               analysis={analysis}
             />
             
-            <ConfigurationPanel 
-              config={config}
-              onChange={setConfig}
+            <SimpleConfigPanel 
               disabled={!uploadedFile}
               file={uploadedFile}
               onConversionStarted={handleConversionStarted}
@@ -80,7 +67,6 @@ export default function ConverterPage() {
               jobId={jobId}
               file={uploadedFile}
               analysis={analysis}
-              config={config}
             />
 
             {/* Quick Stats */}
