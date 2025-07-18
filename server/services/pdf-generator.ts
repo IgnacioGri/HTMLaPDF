@@ -74,9 +74,9 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
         const headerRow = table.querySelector('tr');
         if (headerRow) {
           const columnCount = headerRow.children.length;
-          if (columnCount <= 7) {
+          if (columnCount < 6) {
             table.classList.add('small-table');
-          } else if (columnCount <= 14) {
+          } else if (columnCount <= 10) {
             table.classList.add('medium-table');
           } else {
             table.classList.add('large-table');
@@ -157,15 +157,15 @@ function generateCustomCSS(config: PdfConfig): string {
     
     /* Dynamic font sizing based on column count */
     table.small-table {
-      font-size: 10px !important;
+      font-size: 12px !important;
     }
     
     table.medium-table {
-      font-size: 9px !important;
+      font-size: 10px !important;
     }
     
     table.large-table {
-      font-size: 6px !important;
+      font-size: 8px !important;
     }
     
     table {
