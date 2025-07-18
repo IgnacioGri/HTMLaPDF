@@ -34,13 +34,35 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     
     console.log('Launching Puppeteer browser...');
     
-    // Use installed Chrome path for deployment
-    const executablePath = process.env.PUPPETEER_EXECUTABLE_PATH || 
-                          '/home/runner/.cache/puppeteer/chrome/linux-138.0.7204.157/chrome-linux64/chrome';
+    // Try multiple Chrome executable paths
+    const possiblePaths = [
+      process.env.PUPPETEER_EXECUTABLE_PATH,
+      '/home/runner/.cache/puppeteer/chrome/linux-138.0.7204.157/chrome-linux64/chrome',
+      '/nix/store/zi4f80l169xlmivz8vja8wlphq74qqk0-chromium-125.0.6422.141/bin/chromium',
+      '/usr/bin/google-chrome',
+      '/usr/bin/chromium-browser',
+      '/usr/bin/chrome',
+      '/usr/bin/chromium',
+      '/snap/bin/chromium'
+    ].filter(Boolean);
     
-    browser = await puppeteer.launch({
+    let executablePath;
+    const fs = await import('fs/promises');
+    
+    // Try exact paths
+    for (const path of possiblePaths) {
+      try {
+        await fs.access(path);
+        executablePath = path;
+        console.log(`Found Chrome at: ${path}`);
+        break;
+      } catch (error) {
+        console.log(`Chrome not found at: ${path}`);
+      }
+    }
+    
+    const launchOptions = {
       headless: true,
-      executablePath,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
@@ -60,7 +82,13 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
         '--disable-features=VizDisplayCompositor',
         '--window-size=1920,1080'
       ]
-    });
+    };
+    
+    if (executablePath) {
+      launchOptions.executablePath = executablePath;
+    }
+    
+    browser = await puppeteer.launch(launchOptions);
     console.log('Browser launched successfully');
     
     const page = await browser.newPage();
