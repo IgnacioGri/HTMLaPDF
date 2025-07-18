@@ -260,16 +260,26 @@ function generateCustomCSS(config: PdfConfig): string {
     }
     
     /* COLUMN DISTRIBUTION - Dynamic based on column count */
-    /* Small tables: wider columns */
-    table.small-table th,
-    table.small-table td {
-      width: calc(100% / 7) !important;
+    /* Small tables: wider columns with flexible first column */
+    table.small-table th:first-child,
+    table.small-table td:first-child {
+      width: 35% !important; /* Mucho más ancho para categorías largas */
     }
     
-    /* Medium tables: medium columns */
-    table.medium-table th,
-    table.medium-table td {
-      width: calc(100% / 12) !important;
+    table.small-table th:not(:first-child),
+    table.small-table td:not(:first-child) {
+      width: calc(65% / 6) !important; /* Distribute remaining space */
+    }
+    
+    /* Medium tables: medium columns with flexible first column */
+    table.medium-table th:first-child,
+    table.medium-table td:first-child {
+      width: 25% !important; /* Ancho considerable para nombres */
+    }
+    
+    table.medium-table th:not(:first-child),
+    table.medium-table td:not(:first-child) {
+      width: calc(75% / 11) !important; /* Distribute remaining space */
     }
     
     /* Large tables: small columns */
@@ -278,9 +288,15 @@ function generateCustomCSS(config: PdfConfig): string {
       width: calc(100% / 20) !important;
     }
     
-    /* First column always wider for names */
-    table th:first-child, table td:first-child {
-      width: calc(100% / 6) !important;
+    /* Large tables: keep narrow columns for many columns */
+    table.large-table th:first-child,
+    table.large-table td:first-child {
+      width: 15% !important; /* Menos ancho en tablas grandes */
+    }
+    
+    table.large-table th:not(:first-child),
+    table.large-table td:not(:first-child) {
+      width: calc(85% / 19) !important; /* Distribute remaining space */
     }
     
     /* Preserve original alternating row colors if they exist */
