@@ -26,7 +26,14 @@ export async function generatePdf(
     // Preprocess HTML to eliminate problematic spacing structures
     let processedHTML = htmlContent;
     
-    // Remove excessive spacing around "Rendimiento por activo" sections
+    // TARGETED fix: Remove spacing between specific sections
+    // Find "Inversiones" section and eliminate spacing after it
+    processedHTML = processedHTML.replace(
+      /(<h4[^>]*>Inversiones<\/h4>[\s\S]*?<\/div><\/div><\/div>)([\s]*)(<!--!-->[\s]*<div class="container mt-4">[\s]*<div class="card">[\s]*<div class="card-header bg-custom-reporte-mensual[^>]*>[\s]*<h4[^>]*>Rendimiento por activo)/g,
+      '$1$3'
+    );
+    
+    // Remove excessive spacing around all sections
     processedHTML = processedHTML.replace(/class="container mt-4"/g, 'class="container" style="margin-top:0px!important"');
     processedHTML = processedHTML.replace(/class="m-1 mb-0"/g, 'class="m-0" style="margin:0px!important"');
     
@@ -131,7 +138,7 @@ export async function generatePdf(
         }
       });
       
-      // TARGET: Final elimination of space between "Inversiones" and "Rendimiento por activo"
+      // SURGICAL elimination of space between "Inversiones" and "Rendimiento por activo"
       const inversionesHeaders = Array.from(document.querySelectorAll('.bg-custom-reporte-mensual')).filter(el => 
         el.textContent && el.textContent.includes('Inversiones')
       );
@@ -139,20 +146,30 @@ export async function generatePdf(
       inversionesHeaders.forEach(header => {
         const container = header.closest('.container');
         if (container) {
-          // Force this section to fill available space completely
+          // Force ZERO space after Inversiones
           container.style.setProperty('margin-bottom', '0px', 'important');
           container.style.setProperty('padding-bottom', '0px', 'important');
           
-          // Find the next container (should be Rendimiento por activo)
-          let nextContainer = container.nextElementSibling;
-          while (nextContainer && !nextContainer.querySelector('.bg-custom-reporte-mensual')) {
-            nextContainer = nextContainer.nextElementSibling;
-          }
-          
-          if (nextContainer) {
-            nextContainer.style.setProperty('page-break-before', 'avoid', 'important');
-            nextContainer.style.setProperty('margin-top', '0px', 'important');
-            nextContainer.style.setProperty('padding-top', '0px', 'important');
+          // Find ALL following siblings until we find Rendimiento por activo
+          let current = container.nextElementSibling;
+          while (current) {
+            // If this contains Rendimiento por activo, stick it directly
+            if (current.textContent && current.textContent.includes('Rendimiento por activo')) {
+              current.style.setProperty('page-break-before', 'avoid', 'important');
+              current.style.setProperty('margin-top', '0px', 'important');
+              current.style.setProperty('padding-top', '0px', 'important');
+              break;
+            }
+            // Hide or minimize any intermediate elements
+            if (current.nodeType === 1) { // Element node
+              current.style.setProperty('margin', '0px', 'important');
+              current.style.setProperty('padding', '0px', 'important');
+              current.style.setProperty('height', '0px', 'important');
+              if (current.children.length === 0 && current.textContent.trim() === '') {
+                current.style.setProperty('display', 'none', 'important');
+              }
+            }
+            current = current.nextElementSibling;
           }
         }
       });
