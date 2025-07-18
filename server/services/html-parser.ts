@@ -116,118 +116,69 @@ export function analyzeHtml(htmlContent: string): AnalysisResult {
 export function injectCohenStyles(htmlContent: string): string {
   const $ = cheerio.load(htmlContent);
   
-  // Inject Cohen-specific CSS for PDF generation
+  // Identify and add classes to tables for better CSS targeting
+  $('table').each((i, table) => {
+    const $table = $(table);
+    const colCount = $table.find('tr').first().find('td, th').length;
+    
+    // Add classes based on table characteristics
+    if (colCount >= 6) {
+      $table.addClass('main-table wide-table');
+    } else if (colCount >= 3) {
+      $table.addClass('main-table');
+    } else {
+      $table.addClass('summary-table');
+    }
+    
+    // Mark investment detail rows
+    $table.find('tr').each((j, row) => {
+      const rowText = $(row).text().toLowerCase();
+      if (rowText.includes('lote') && rowText.includes('/')) {
+        $(row).addClass('detail-row');
+      } else if (rowText.includes('$') || rowText.includes('u$s')) {
+        $(row).addClass('main-row');
+      }
+    });
+  });
+  
+  // Add section classes for better page breaks
+  $('*').each((i, el) => {
+    const text = $(el).text().toLowerCase();
+    if (text.includes('tenencias al') || text.includes('resumen de') || text.includes('movimientos entre')) {
+      $(el).addClass('section-header avoid-break');
+    }
+    if (text.includes('renta fija') || text.includes('renta variable') || text.includes('acciones argentinas')) {
+      $(el).addClass('investment-group avoid-break');
+    }
+  });
+  
+  // Remove the old style tag if exists and replace with optimized one
+  $('style').remove();
+  
+  // Inject minimal Cohen-specific CSS - main styling will come from generateCustomCSS
   const cohenStyles = `
     <style>
-      @page {
-        margin: 5mm;
-        size: A4;
-      }
-      
-      body {
-        font-family: 'Inter', Arial, sans-serif;
-        font-size: 10px;
-        line-height: 1.3;
-        color: #2D3748;
-        margin: 0;
-        padding: 0;
-      }
-      
+      /* Basic Cohen branding - detailed styles applied via page.addStyleTag */
       .cohen-header {
-        background-color: #8B4A6B !important;
+        background-color: #8B0000 !important;
         color: white !important;
         padding: 8px 12px;
         font-weight: 600;
-        border: none;
-        page-break-inside: avoid;
+        text-align: center;
       }
       
+      /* Ensure all tables are marked for processing */
       table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-bottom: 10px;
-        font-size: 9px;
-        page-break-inside: avoid;
+        border-collapse: collapse !important;
+        width: 100% !important;
       }
       
-      th, td {
-        padding: 4px 6px;
-        border: 1px solid #E2E8F0;
-        text-align: left;
-        vertical-align: top;
-      }
-      
-      th {
-        background-color: #8B4A6B !important;
-        color: white !important;
-        font-weight: 600;
-        page-break-inside: avoid;
-        page-break-after: avoid;
-      }
-      
-      tbody tr:nth-child(even) {
-        background-color: #F8F9FA;
-      }
-      
-      tbody tr:nth-child(odd) {
-        background-color: white;
-      }
-      
-      .asset-group {
-        page-break-inside: avoid;
-        margin-bottom: 8px;
-      }
-      
-      .section-header {
-        background-color: #8B4A6B !important;
-        color: white !important;
-        padding: 6px 12px;
-        font-weight: 600;
-        margin: 10px 0 5px 0;
-        page-break-inside: avoid;
-        page-break-after: avoid;
-      }
-      
-      .page-break {
-        page-break-before: always;
-      }
-      
-      .no-break {
-        page-break-inside: avoid;
-      }
-      
-      h1, h2, h3, h4, h5, h6 {
-        color: #8B4A6B;
-        page-break-inside: avoid;
-        page-break-after: avoid;
-        margin: 8px 0 4px 0;
-      }
-      
-      .table-header-repeat {
-        display: table-header-group;
-      }
-      
-      @media print {
-        .no-print {
-          display: none !important;
-        }
-        
-        table {
-          page-break-inside: auto;
-        }
-        
-        tr {
-          page-break-inside: avoid;
-          page-break-after: auto;
-        }
-        
-        thead {
-          display: table-header-group;
-        }
-        
-        tfoot {
-          display: table-footer-group;
-        }
+      /* Initial sizing to prevent overflow */
+      body {
+        max-width: 210mm;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
       }
     </style>
   `;
@@ -238,22 +189,6 @@ export function injectCohenStyles(htmlContent: string): string {
   } else {
     $('html').prepend(`<head>${cohenStyles}</head>`);
   }
-  
-  // Add Cohen classes to existing elements
-  $('table').each((i, table) => {
-    $(table).addClass('cohen-table');
-    $(table).find('th').addClass('cohen-header');
-    $(table).find('thead').addClass('table-header-repeat');
-  });
-  
-  // Identify and mark section headers
-  $('h1, h2, h3').each((i, header) => {
-    if ($(header).text().toLowerCase().includes('resumen') ||
-        $(header).text().toLowerCase().includes('tenencias') ||
-        $(header).text().toLowerCase().includes('liquidez')) {
-      $(header).addClass('section-header');
-    }
-  });
   
   return $.html();
 }
