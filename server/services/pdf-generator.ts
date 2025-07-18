@@ -19,6 +19,15 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     // Update job status to processing
     await storage.updateConversionJobStatus(jobId, "processing");
     
+    console.log('Environment:', process.env.NODE_ENV);
+    console.log('HTML content size:', htmlContent.length, 'characters');
+    
+    // Set timeout based on content size - larger files need more time
+    const contentSizeKB = htmlContent.length / 1024;
+    const baseTimeout = 30000; // 30 seconds base
+    const dynamicTimeout = Math.min(120000, baseTimeout + (contentSizeKB * 100)); // Max 2 minutes
+    console.log('Dynamic timeout set to:', dynamicTimeout, 'ms for', Math.round(contentSizeKB), 'KB content');
+    
     // Optimize HTML for large files
     let optimizedHtml = htmlContent;
     if (contentSizeKB > 500) { // If file is larger than 500KB
@@ -49,15 +58,7 @@ export async function generatePdf(htmlContent: string, config: PdfConfig, jobId:
     </html>
     `;
     
-    console.log('Environment:', process.env.NODE_ENV);
-    console.log('HTML content size:', htmlContent.length, 'characters');
     console.log('Launching Puppeteer browser...');
-    
-    // Set timeout based on content size - larger files need more time
-    const contentSizeKB = htmlContent.length / 1024;
-    const baseTimeout = 30000; // 30 seconds base
-    const dynamicTimeout = Math.min(120000, baseTimeout + (contentSizeKB * 100)); // Max 2 minutes
-    console.log('Dynamic timeout set to:', dynamicTimeout, 'ms for', Math.round(contentSizeKB), 'KB content');
     
     const launchOptions = {
       headless: true,
