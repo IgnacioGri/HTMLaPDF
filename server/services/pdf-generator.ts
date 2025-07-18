@@ -141,51 +141,99 @@ function generateCustomCSS(config: PdfConfig): string {
       margin: 0 !important;
     }
     
-    /* ULTRA WIDE TABLES - use every millimeter */
+    /* SMART TABLES - Dynamic sizing based on column count */
     table {
       width: 100% !important;
-      table-layout: fixed !important; /* Fixed para control total */
+      table-layout: fixed !important;
       border-collapse: collapse !important;
       margin: 3px 0 !important;
-      font-size: 8px !important; /* Tamaño para mostrar más columnas */
     }
     
-    /* Headers compactos pero legibles */
+    /* DEFAULT: Tables with many columns (15+) - small font */
+    table {
+      font-size: 7px !important;
+    }
+    
     table th {
-      background-color: #8B4A8C !important; /* Color morado original Cohen */
+      background-color: #8B4A8C !important;
       color: white !important;
       font-weight: bold !important;
       text-align: center !important;
-      padding: 2px 1px !important; /* Ultra compacto */
+      padding: 2px 1px !important;
       border: 0.5px solid #666 !important;
-      font-size: 8px !important;
+      font-size: 7px !important;
       line-height: 1.0 !important;
       white-space: nowrap !important;
       overflow: hidden !important;
     }
     
-    /* Celdas ultra compactas */
     table td {
-      padding: 1px 0.5px !important; /* Mínimo padding */
+      padding: 1px 0.5px !important;
       border: 0.5px solid #ccc !important;
       vertical-align: top !important;
-      font-size: 7px !important; /* Pequeño para mostrar todo */
+      font-size: 6px !important;
       line-height: 1.0 !important;
       white-space: nowrap !important;
       overflow: hidden !important;
       text-overflow: ellipsis !important;
     }
     
-    /* FORZAR distribución de columnas para mostrar TODAS */
-    table th, table td {
-      width: calc(100% / 20) !important; /* Distribuir equitativamente */
-      min-width: 0 !important;
-      max-width: none !important;
+    /* SMALL TABLES: Less than 8 columns - bigger font */
+    table:has(tr th:nth-child(-n+7):last-child) {
+      font-size: 11px !important;
     }
     
-    /* Primera columna más ancha para nombres */
+    table:has(tr th:nth-child(-n+7):last-child) th {
+      font-size: 11px !important;
+      padding: 4px 3px !important;
+      line-height: 1.2 !important;
+    }
+    
+    table:has(tr th:nth-child(-n+7):last-child) td {
+      font-size: 10px !important;
+      padding: 3px 2px !important;
+      line-height: 1.1 !important;
+    }
+    
+    /* MEDIUM TABLES: 8-14 columns - medium font */
+    table:has(tr th:nth-child(8)) table:not(:has(tr th:nth-child(15))) {
+      font-size: 9px !important;
+    }
+    
+    table:has(tr th:nth-child(8)) table:not(:has(tr th:nth-child(15))) th {
+      font-size: 9px !important;
+      padding: 3px 2px !important;
+      line-height: 1.1 !important;
+    }
+    
+    table:has(tr th:nth-child(8)) table:not(:has(tr th:nth-child(15))) td {
+      font-size: 8px !important;
+      padding: 2px 1px !important;
+      line-height: 1.0 !important;
+    }
+    
+    /* COLUMN DISTRIBUTION - Dynamic based on column count */
+    /* Small tables: wider columns */
+    table:has(tr th:nth-child(-n+7):last-child) th,
+    table:has(tr th:nth-child(-n+7):last-child) td {
+      width: calc(100% / 7) !important;
+    }
+    
+    /* Medium tables: medium columns */
+    table:has(tr th:nth-child(8)) table:not(:has(tr th:nth-child(15))) th,
+    table:has(tr th:nth-child(8)) table:not(:has(tr th:nth-child(15))) td {
+      width: calc(100% / 12) !important;
+    }
+    
+    /* Large tables: small columns */
+    table:has(tr th:nth-child(15)) th,
+    table:has(tr th:nth-child(15)) td {
+      width: calc(100% / 20) !important;
+    }
+    
+    /* First column always wider for names */
     table th:first-child, table td:first-child {
-      width: calc(100% / 8) !important; /* Más ancho para nombres */
+      width: calc(100% / 6) !important;
     }
     
     /* Preserve original alternating row colors if they exist */
