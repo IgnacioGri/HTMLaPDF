@@ -118,7 +118,7 @@ function generateCustomCSS(config: PdfConfig): string {
     
     @page {
       size: A4;
-      margin: 15mm 10mm 10mm 10mm; /* Optimized margins for more content */
+      margin: 12mm 8mm 10mm 8mm; /* Ultra-tight margins for maximum column space */
     }
     
     body {
@@ -153,15 +153,18 @@ function generateCustomCSS(config: PdfConfig): string {
       line-height: 1.1 !important;
     }
     
-    /* Preserve original cell styling with better readability */
+    /* Ultra-compact cell styling to fit more columns */
     table td {
-      padding: 2px 1.5px !important; /* Compact padding for tighter rows */
+      padding: 1.5px 1px !important; /* Ultra-compact padding */
       border: 1px solid #ccc !important;
       vertical-align: top !important;
-      font-size: 9px !important; /* Increased font size for readability */
-      line-height: 1.1 !important; /* Tighter line height */
+      font-size: 8px !important; /* Smaller font to fit more columns */
+      line-height: 1.05 !important; /* Ultra-tight line height */
       word-wrap: break-word !important;
       overflow-wrap: break-word !important;
+      white-space: nowrap !important; /* Prevent wrapping in narrow columns */
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
     }
     
     /* Optimized column distribution - ensure ALL columns are visible */
@@ -171,26 +174,29 @@ function generateCustomCSS(config: PdfConfig): string {
       font-size: 8px !important; /* Base font size for tables */
     }
     
-    /* For wide tables, optimize column widths to fit all columns */
-    table td:nth-child(1), table th:nth-child(1) { width: 10% !important; }
-    table td:nth-child(2), table th:nth-child(2) { width: 8% !important; }
-    table td:nth-child(3), table th:nth-child(3) { width: 7% !important; }
-    table td:nth-child(4), table th:nth-child(4) { width: 8% !important; }
-    table td:nth-child(5), table th:nth-child(5) { width: 8% !important; }
-    table td:nth-child(6), table th:nth-child(6) { width: 7% !important; }
-    table td:nth-child(7), table th:nth-child(7) { width: 9% !important; }
-    table td:nth-child(8), table th:nth-child(8) { width: 8% !important; }
-    table td:nth-child(9), table th:nth-child(9) { width: 7% !important; }
-    table td:nth-child(10), table th:nth-child(10) { width: 8% !important; }
-    table td:nth-child(11), table th:nth-child(11) { width: 8% !important; }
-    table td:nth-child(12), table th:nth-child(12) { width: 7% !important; }
-    table td:nth-child(13), table th:nth-child(13) { width: 7% !important; }
+    /* Ultra-compact column distribution to fit ALL columns including last 3-4 */
+    table td:nth-child(1), table th:nth-child(1) { width: 8% !important; }
+    table td:nth-child(2), table th:nth-child(2) { width: 6.5% !important; }
+    table td:nth-child(3), table th:nth-child(3) { width: 6% !important; }
+    table td:nth-child(4), table th:nth-child(4) { width: 6.5% !important; }
+    table td:nth-child(5), table th:nth-child(5) { width: 6.5% !important; }
+    table td:nth-child(6), table th:nth-child(6) { width: 6% !important; }
+    table td:nth-child(7), table th:nth-child(7) { width: 7% !important; }
+    table td:nth-child(8), table th:nth-child(8) { width: 6.5% !important; }
+    table td:nth-child(9), table th:nth-child(9) { width: 6% !important; }
+    table td:nth-child(10), table th:nth-child(10) { width: 6.5% !important; }
+    table td:nth-child(11), table th:nth-child(11) { width: 6.5% !important; }
+    table td:nth-child(12), table th:nth-child(12) { width: 6% !important; }
+    table td:nth-child(13), table th:nth-child(13) { width: 6% !important; }
+    table td:nth-child(14), table th:nth-child(14) { width: 6% !important; }
+    table td:nth-child(15), table th:nth-child(15) { width: 6% !important; }
+    table td:nth-child(16), table th:nth-child(16) { width: 5.5% !important; }
     
-    /* Ensure no columns are cut off - all columns visible */
-    table td:nth-child(n+14), table th:nth-child(n+14) { 
-      width: auto !important; 
-      min-width: 5% !important; 
-      max-width: 8% !important;
+    /* Force remaining columns to be visible */
+    table td:nth-child(n+17), table th:nth-child(n+17) { 
+      width: 5% !important; 
+      min-width: 4% !important; 
+      font-size: 7px !important;
     }
     
     /* Preserve original alternating row colors if they exist */
