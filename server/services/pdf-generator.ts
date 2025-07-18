@@ -223,29 +223,42 @@ export async function generatePdf(
           });
         }
         
-        // CRITICAL: ELIMINATE footer repetition completely
+        // SURGICAL: Remove problematic footer rows during page breaks
+        const allRows = table.querySelectorAll('tr');
+        allRows.forEach((row, index) => {
+          const cellText = row.textContent || '';
+          
+          // If this row contains "TOTAL" text, mark it for special handling
+          if (cellText.includes('TOTAL INVERSIONES') || cellText.includes('TOTAL ') || 
+              cellText.includes('total ') || cellText.includes('Total ')) {
+            
+            // CRITICAL: Prevent this row from appearing in page breaks
+            row.style.setProperty('page-break-before', 'avoid', 'important');
+            row.style.setProperty('break-before', 'avoid', 'important');
+            row.style.setProperty('page-break-after', 'avoid', 'important');
+            row.style.setProperty('break-after', 'avoid', 'important');
+            
+            // Force this row to stay with previous content
+            row.style.setProperty('orphans', '0', 'important');
+            row.style.setProperty('widows', '0', 'important');
+            
+            // Add special class for CSS targeting
+            row.classList.add('total-row-no-repeat');
+            
+            // Ensure at least 5 previous rows stay with this total
+            for (let i = Math.max(0, index - 5); i < index; i++) {
+              if (allRows[i]) {
+                allRows[i].style.setProperty('page-break-after', 'avoid', 'important');
+                allRows[i].style.setProperty('break-after', 'avoid', 'important');
+              }
+            }
+          }
+        });
+        
+        // Also handle tfoot if present
         const tfoot = table.querySelector('tfoot');
         if (tfoot) {
-          // NUCLEAR: Remove footer from table structure to prevent ANY repetition
           tfoot.style.setProperty('display', 'none', 'important');
-          
-          // Alternative: Convert footer to regular div and append after table
-          const footerContent = tfoot.innerHTML;
-          const footerDiv = document.createElement('div');
-          footerDiv.innerHTML = footerContent;
-          footerDiv.style.setProperty('background-color', '#112964', 'important');
-          footerDiv.style.setProperty('color', 'white', 'important');
-          footerDiv.style.setProperty('font-weight', 'bold', 'important');
-          footerDiv.style.setProperty('padding', '8px', 'important');
-          footerDiv.style.setProperty('text-align', 'center', 'important');
-          footerDiv.style.setProperty('page-break-inside', 'avoid', 'important');
-          footerDiv.style.setProperty('break-inside', 'avoid', 'important');
-          
-          // Insert the div right after the table
-          table.parentNode.insertBefore(footerDiv, table.nextSibling);
-          
-          // Remove the original tfoot
-          tfoot.remove();
         }
         
         // Allow tbody to break naturally
@@ -598,21 +611,30 @@ function generateCustomCSS(config: PdfConfig): string {
       display: table-header-group !important;
     }
     
-    /* NUCLEAR: Completely hide all table footers */
+    /* Hide all table footers */
     tfoot {
       display: none !important;
     }
     
-    /* Style converted footer divs */
-    .table-footer-converted {
-      background-color: #112964 !important;
-      color: white !important;
-      font-weight: bold !important;
-      padding: 8px !important;
-      text-align: center !important;
+    /* SURGICAL: Prevent total rows from breaking incorrectly */
+    .total-row-no-repeat {
+      page-break-before: avoid !important;
+      break-before: avoid !important;
+      page-break-after: avoid !important;
+      break-after: avoid !important;
       page-break-inside: avoid !important;
       break-inside: avoid !important;
-      margin: 0 !important;
+    }
+    
+    /* Keep total rows with their context */
+    tr:has(.total-row-no-repeat),
+    tr[class*="total"],
+    tr:contains("TOTAL"),
+    tr:contains("Total") {
+      page-break-before: avoid !important;
+      break-before: avoid !important;
+      orphans: 0 !important;
+      widows: 0 !important;
     }
     
     /* Force table headers to repeat on page breaks */
