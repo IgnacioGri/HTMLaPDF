@@ -223,6 +223,26 @@ export async function generatePdf(
           });
         }
         
+        // CRITICAL: Prevent footer repetition
+        const tfoot = table.querySelector('tfoot');
+        if (tfoot) {
+          // DISABLE footer repetition completely
+          tfoot.style.setProperty('display', 'table-footer-group', 'important');
+          tfoot.style.setProperty('break-inside', 'avoid', 'important');
+          tfoot.style.setProperty('page-break-inside', 'avoid', 'important');
+          
+          // Force footer to stay with last row only
+          tfoot.style.setProperty('position', 'static', 'important');
+          
+          // Ensure footer rows DON'T repeat
+          const footerRows = tfoot.querySelectorAll('tr');
+          footerRows.forEach(row => {
+            row.style.setProperty('break-inside', 'avoid', 'important');
+            row.style.setProperty('page-break-inside', 'avoid', 'important');
+            // NO display: table-row to prevent repetition
+          });
+        }
+        
         // Allow tbody to break naturally
         const tbody = table.querySelector('tbody');
         if (tbody) {
@@ -571,6 +591,19 @@ function generateCustomCSS(config: PdfConfig): string {
       break-inside: avoid !important;
       page-break-inside: avoid !important;
       display: table-header-group !important;
+    }
+    
+    /* CRITICAL: DISABLE footer repetition completely */
+    tfoot {
+      display: table-footer-group !important;
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+    }
+    
+    tfoot tr, tfoot td, tfoot th {
+      break-inside: avoid !important;
+      page-break-inside: avoid !important;
+      /* NO table-row display to prevent repetition */
     }
     
     /* Force table headers to repeat on page breaks */
