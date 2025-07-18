@@ -187,7 +187,7 @@ export async function generatePdf(
       content: generateCustomCSS(config)
     });
     
-    // Configure PDF options with optimized settings for Cohen reports
+    // Configure PDF options with AGGRESSIVE pagination control
     const pdfOptions = {
       format: config.pageSize as any,
       landscape: config.orientation === 'landscape',
@@ -199,10 +199,10 @@ export async function generatePdf(
       },
       printBackground: true,
       displayHeaderFooter: false,
-      preferCSSPageSize: true,
-      scale: 1.0, // Don't use config.contentScale here, we'll handle it in CSS
+      preferCSSPageSize: false, // Let us control the sizing completely
+      scale: 0.95, // Slightly smaller to fit more content
       width: '297mm', // A4 landscape width  
-      height: '210mm', // A4 landscape height
+      height: '420mm', // DOUBLE the height to force content compression
     };
     
     // Generate filename
@@ -499,17 +499,27 @@ function generateCustomCSS(config: PdfConfig): string {
       padding-top: 0 !important;
     }
     
-    /* FINAL FIX: Force consecutive Cohen sections to stick */
-    .bg-custom-reporte-mensual:contains("Inversiones") ~ * .bg-custom-reporte-mensual:contains("Rendimiento") {
+    /* NUCLEAR OPTION: Disable ALL page breaks */
+    * {
       page-break-before: avoid !important;
+      page-break-after: avoid !important;
+      page-break-inside: avoid !important;
       break-before: avoid !important;
+      break-after: avoid !important;
+      break-inside: avoid !important;
     }
     
-    /* Nuclear option: eliminate ALL space between major sections */
-    .container + .container {
-      page-break-before: avoid !important;
-      break-before: avoid !important;
-      margin-top: 0 !important;
+    /* Force everything into a single flowing document */
+    html, body {
+      height: auto !important;
+      overflow: visible !important;
+    }
+    
+    /* Ultra-compact layout */
+    .container {
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 2px !important;
     }
     
     /* Optimize page breaks for better content flow */
