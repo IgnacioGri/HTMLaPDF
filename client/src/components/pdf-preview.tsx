@@ -15,10 +15,10 @@ interface PdfPreviewProps {
 export default function PdfPreview({ jobId, file, analysis }: PdfPreviewProps) {
   const [progress, setProgress] = useState(0);
 
-  const { data: job, refetchInterval } = useQuery({
+  const { data: job } = useQuery({
     queryKey: ["/api/job", jobId],
     enabled: !!jobId,
-    refetchInterval: jobId && job?.status === "processing" ? 1000 : false,
+    refetchInterval: jobId ? 1000 : false,
   });
 
   useEffect(() => {
