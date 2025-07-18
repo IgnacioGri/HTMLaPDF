@@ -223,24 +223,29 @@ export async function generatePdf(
           });
         }
         
-        // CRITICAL: Prevent footer repetition
+        // CRITICAL: ELIMINATE footer repetition completely
         const tfoot = table.querySelector('tfoot');
         if (tfoot) {
-          // DISABLE footer repetition completely
-          tfoot.style.setProperty('display', 'table-footer-group', 'important');
-          tfoot.style.setProperty('break-inside', 'avoid', 'important');
-          tfoot.style.setProperty('page-break-inside', 'avoid', 'important');
+          // NUCLEAR: Remove footer from table structure to prevent ANY repetition
+          tfoot.style.setProperty('display', 'none', 'important');
           
-          // Force footer to stay with last row only
-          tfoot.style.setProperty('position', 'static', 'important');
+          // Alternative: Convert footer to regular div and append after table
+          const footerContent = tfoot.innerHTML;
+          const footerDiv = document.createElement('div');
+          footerDiv.innerHTML = footerContent;
+          footerDiv.style.setProperty('background-color', '#112964', 'important');
+          footerDiv.style.setProperty('color', 'white', 'important');
+          footerDiv.style.setProperty('font-weight', 'bold', 'important');
+          footerDiv.style.setProperty('padding', '8px', 'important');
+          footerDiv.style.setProperty('text-align', 'center', 'important');
+          footerDiv.style.setProperty('page-break-inside', 'avoid', 'important');
+          footerDiv.style.setProperty('break-inside', 'avoid', 'important');
           
-          // Ensure footer rows DON'T repeat
-          const footerRows = tfoot.querySelectorAll('tr');
-          footerRows.forEach(row => {
-            row.style.setProperty('break-inside', 'avoid', 'important');
-            row.style.setProperty('page-break-inside', 'avoid', 'important');
-            // NO display: table-row to prevent repetition
-          });
+          // Insert the div right after the table
+          table.parentNode.insertBefore(footerDiv, table.nextSibling);
+          
+          // Remove the original tfoot
+          tfoot.remove();
         }
         
         // Allow tbody to break naturally
@@ -593,17 +598,21 @@ function generateCustomCSS(config: PdfConfig): string {
       display: table-header-group !important;
     }
     
-    /* CRITICAL: DISABLE footer repetition completely */
+    /* NUCLEAR: Completely hide all table footers */
     tfoot {
-      display: table-footer-group !important;
-      break-inside: avoid !important;
-      page-break-inside: avoid !important;
+      display: none !important;
     }
     
-    tfoot tr, tfoot td, tfoot th {
-      break-inside: avoid !important;
+    /* Style converted footer divs */
+    .table-footer-converted {
+      background-color: #112964 !important;
+      color: white !important;
+      font-weight: bold !important;
+      padding: 8px !important;
+      text-align: center !important;
       page-break-inside: avoid !important;
-      /* NO table-row display to prevent repetition */
+      break-inside: avoid !important;
+      margin: 0 !important;
     }
     
     /* Force table headers to repeat on page breaks */
