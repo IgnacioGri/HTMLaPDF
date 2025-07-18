@@ -360,11 +360,26 @@ function generateCustomCSS(config: PdfConfig): string {
       break-inside: avoid !important;
     }
     
-    /* Keep section title with at least first 3 rows of content */
+    /* FORCE titles to stay with content - especially for large documents */
     h1 + table, h2 + table, h3 + table, h4 + table, h5 + table, h6 + table,
     .section-title + table {
       page-break-before: avoid !important;
       break-before: avoid !important;
+    }
+    
+    /* Specific rules for problematic sections in large documents */
+    *:contains("Rendimiento por activo") + table,
+    *:contains("Rendimiento por activo") + * + table,
+    *:contains("Rendimiento por activo") + * + * + table {
+      page-break-before: avoid !important;
+      break-before: avoid !important;
+    }
+    
+    /* Force grouping for investment sections */
+    *:contains("Rendimiento por activo") {
+      page-break-after: avoid !important;
+      page-break-inside: avoid !important;
+      keep-with-next: always !important;
     }
     
     /* Optimize page breaks for better content flow */
@@ -419,10 +434,26 @@ function generateCustomCSS(config: PdfConfig): string {
         page-break-after: auto;
       }
       
+      /* AGGRESSIVE orphan prevention for large documents */
+      h1, h2, h3, h4, h5, h6 {
+        orphans: 4 !important; /* Need 4 lines of content after title */
+        widows: 2 !important;
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+      }
+      
       /* Typography improvements */
       p {
         orphans: 2;
         widows: 2;
+      }
+      
+      /* Large document specific: eliminate empty space after sections */
+      div:empty, p:empty {
+        display: none !important;
+        height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
       
       /* Better section spacing */
